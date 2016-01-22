@@ -4,6 +4,7 @@
     var loader = new ImageBatch("images/"),
         getTimestamp = null,
         lastTime = 0,
+        titleImage = loader.load("title.png"),
         backgroundTiles = [
             loader.load("backgroundStripe.png")
         ],
@@ -53,12 +54,19 @@
         }
     }
     
+    function drawCentered(context, image, x, y, width, height) {
+        var spareX = (width - image.width) * 0.5,
+            spareY = (height - image.height) * 0.5;
+        context.drawImage(image, x + spareX, y + spareY);
+    }
+    
     function draw(context, width, height) {
         if (!loader.loaded) {
             return;
         }
         var tile = backgroundTiles[0];
         drawTiled(context, tile, width, height);
+        drawCentered(context, titleImage, 0, 0, width, height);
     }
     
     function update() {
