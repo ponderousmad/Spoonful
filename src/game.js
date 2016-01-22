@@ -34,7 +34,7 @@
         var tileX = 0,
             tileY = 0,
             spanX = tile.width,
-            spanY = tile.height
+            spanY = tile.height;
         
         while (tileY < height) {
             if (tileY + spanY > width) {
@@ -55,7 +55,7 @@
     
     function draw(context, width, height) {
         if (!loader.loaded) {
-            return
+            return;
         }
         var tile = backgroundTiles[0];
         drawTiled(context, tile, width, height);
