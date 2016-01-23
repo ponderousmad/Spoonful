@@ -19,20 +19,31 @@ var Player = (function () {
     function Rocket(location, velocity) {
         this.location = location.clone();
         this.velocity = velocity.clone();
+        this.accel = 0.02;
+        this.accelDirection = velocity.clone();
     }
     
     Rocket.prototype.draw = function(context) {
         if (!loader.loaded) {
             return;
         }
-        var rocketLength = 25,
+        var rocketLength = 50,
             flameOffset = 5,
-            rocketHeight = rocketLength / rocket.width;
-        context.drawImage(rocket, this.location.x - flameOffset, this.location.y - rocketHeight * 0.5, rocketLength, rocketHeight);
+            rocketHeight = rocket.height * (rocketLength / rocket.width),
+            rocketAngle = Math.atan2(this.velocity.y, this.velocity.x);
+            
+        context.save();
+        context.translate(this.location.x, this.location.y);
+        context.rotate(rocketAngle);
+        context.drawImage(rocket, -flameOffset, -rocketHeight * 0.5, rocketLength, rocketHeight);
+        context.restore();
     };
     
     Rocket.prototype.update = function(elapsed, platforms, particles, enemies, gravity) {
+        this.accelDirection.copy(this.velocity);
+        this.accelDirection.normalize();
         this.velocity.addScaled(gravity, elapsed);
+        this.velocity.addScaled(this.accelDirection, this.accel * elapsed);
         this.location.addScaled(this.velocity, elapsed);
     };
     
@@ -96,7 +107,7 @@ var Player = (function () {
         
         if (mouse.leftDown) {
             console.log("Fire rocket");
-            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(1, 0)));
+            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(.5, -.5)));
         }
         
         for (var r = 0; r < this.rockets.length; ++r) {
