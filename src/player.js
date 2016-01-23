@@ -6,7 +6,7 @@ var Player = (function () {
         leg = loader.load("leg.png"),
         arm = loader.load("arm.png"),
         rocket = loader.load("rocket.png"),
-        explosion = new Flipbook(loader, "Explode", 8, 2),
+        explosion = new Flipbook(loader, "explode", 8, 2),
         playerHeight = 200,
         legPivotHeight = playerHeight * 0.5,
         armPivotHeight = playerHeight * 0.78,
@@ -55,7 +55,7 @@ var Player = (function () {
     
     Rocket.prototype.update = function(elapsed, buttonDown, platforms, particles, enemies, gravity) {
         if (this.exploding !== null) {
-            this.velocity.scale(0.5 * elapsed);
+            this.velocity.scale(0.8);
             this.contact.addScaled(this.velocity, elapsed);
             if (explosion.updatePlayback(elapsed, this.exploding)) {
                 this.exploding = null;
@@ -98,6 +98,7 @@ var Player = (function () {
         } else if (!buttonDown) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
             this.contact = this.location;
+            this.velocity.scale(0.4);
         }
         return true;
     };
@@ -165,11 +166,16 @@ var Player = (function () {
     
     Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse) {
         this.swingDelta += elapsed;
-        // this.location.x += elapsed * 0.1;
+        this.location.x += elapsed * 0.1;
         
         if (mouse.leftDown) {
             console.log("Fire rocket");
-            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(.5, -0.5)));
+            var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)),
+                direction = LINEAR.subVectors(mouse.location, source);
+            
+            direction.normalize();
+            
+            this.rockets.push(new Rocket(source, direction));
         }
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
