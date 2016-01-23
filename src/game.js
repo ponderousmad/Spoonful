@@ -10,9 +10,11 @@
         ],
         platformImages = [
         ],
-        particles = [],
+        particles = [
+            new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1)
+        ],
         platforms = [],
-        gravity = 9.8,
+        gravity = new LINEAR.Vector(0, 0.0098),
         playedSpoons = false,
         spoonInstrument = new SoundEffect("audio/clicky.wav");
         
@@ -71,6 +73,12 @@
         }
         var tile = backgroundTiles[0];
         drawTiled(context, tile, width, height);
+        
+        
+        for (var p = 0; p < particles.length; ++p) {
+            particles[p].draw(context);
+        }
+        
         drawCentered(context, titleImage, 0, 0, width, height);
     }
     

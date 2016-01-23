@@ -1,11 +1,19 @@
 var PARTICLES = (function () {
     "use strict";
     
+    var loader = new ImageBatch("images/"),
+        images = [
+            loader.load("ParticleBrown.png")
+        ];
+    
+    loader.commit();
+    
     function Particle(location, radius, mass) {
         this.location = location;
         this.radius = radius;
         this.mass = mass;        
-        this.velocity = new LINEAR.Vector(0,0);
+        this.velocity = new LINEAR.Vector(0, 0);
+        this.falling = true;
     }
     
     Particle.prototype.update = function(elapsed, particles, platforms, gravity) {
@@ -13,6 +21,11 @@ var PARTICLES = (function () {
             if (particles[p].isBelow(this.location)) {
                 var particle = particles[p];
             }
+        }
+        
+        if (this.falling) {
+            this.velocity.addScaled(gravity, elapsed);
+            this.location.addScaled(this.velocity, elapsed);
         }
     };
     
@@ -27,6 +40,13 @@ var PARTICLES = (function () {
     function orderByHeight(p, q) {
         return p.location.y > q.location.y;
     }
+    
+    Particle.prototype.draw = function(context) {
+        if (loader.loaded) {
+            var size = 2 * this.radius;
+            context.drawImage(images[0], this.location.x, this.location.y, size, size);
+        }
+    };
     
     return {
         Particle: Particle,
