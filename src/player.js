@@ -64,6 +64,7 @@ var Player = (function () {
     
     Player.prototype.update = function (elapsed) {
         this.swingDelta += elapsed;
+        this.location.x += elapsed * 0.1;
     };
     
     return Player;
