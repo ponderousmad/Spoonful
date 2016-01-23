@@ -22,7 +22,6 @@
         ],
         gravity = new LINEAR.Vector(0, 0.0098),
         player = new Player(new LINEAR.Vector(75, 550)),
-        playedSpoons = false,
         spoonInstrument = new SoundEffect("audio/clicky.wav");
         
     
@@ -98,11 +97,6 @@
     function update() {
         var now = getTimestamp(),
             elapsed = Math.min(now - lastTime, 32);
-            
-        if (!playedSpoons && spoonInstrument.isLoaded()) {
-            playedSpoons = true;
-            spoonInstrument.play();
-        }
         
         for (var p = 0; p < particles.length; ++p) {
             particles[p].update(elapsed, particles, platforms, gravity);
