@@ -16,7 +16,7 @@ var PARTICLES = (function () {
         this.falling = true;
     }
     
-    Particle.prototype.update = function(elapsed, particles, platforms, gravity) {
+    Particle.prototype.update = function (elapsed, particles, platforms, gravity) {
         for (var p = 0; p < particles.length; ++p) {
             if (particles[p].isBelow(this.location)) {
                 var particle = particles[p];
@@ -29,7 +29,7 @@ var PARTICLES = (function () {
         }
     };
     
-    Particle.prototype.isBelow = function(location) {
+    Particle.prototype.isBelow = function (location) {
         if (location.y > this.location.y) {
             return false;
         }
@@ -37,16 +37,16 @@ var PARTICLES = (function () {
         return Math.abs(xDiff) <= this.radius;
     };
     
-    function orderByHeight(p, q) {
-        return p.location.y > q.location.y;
-    }
-    
-    Particle.prototype.draw = function(context) {
+    Particle.prototype.draw = function (context) {
         if (loader.loaded) {
             var size = 2 * this.radius;
             context.drawImage(images[0], this.location.x, this.location.y, size, size);
         }
     };
+    
+    function orderByHeight(p, q) {
+        return p.location.y > q.location.y;
+    }
     
     return {
         Particle: Particle,
