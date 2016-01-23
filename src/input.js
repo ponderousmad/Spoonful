@@ -90,14 +90,10 @@ var INPUT = (function (LINEAR) {
 
             self.location.set(event.clientX - bounds.left, event.clientY - bounds.top);
 
-            self.leftDown = self.left && !self.wasLeft;
-            self.middleDown = self.middle && !self.wasMiddle;
-            self.rightDown = self.right && !self.wasRight;
-            
-            if (self.leftDown) {
-                console.log("left pressed");
-            }
-            
+            self.leftDown = self.leftDown || (self.left && !self.wasLeft);
+            self.middleDown = self.middleDown || (self.middle && !self.wasMiddle);
+            self.rightDown = self.rightDown || (self.right && !self.wasRight);
+                      
             self.wasLeft = self.left;
             self.wasRight = self.right;
             self.wasMiddle = self.middle;
