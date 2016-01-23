@@ -380,5 +380,7 @@ var LINEAR = (function () {
     
     linear.AABox = AABox;
     
+    linear.ZERO = new Vector(0, 0);
+    
     return linear;
 }());

@@ -41,11 +41,13 @@ var Player = (function () {
             rocketAngle = Math.atan2(this.velocity.y, this.velocity.x);
             
         context.save();
-        context.translate(this.location.x, this.location.y);
-        context.rotate(rocketAngle);
         if (this.exploding !== null) {
-            explosion.draw(context, this.exploding, this.contact, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
+            context.translate(this.contact.x, this.contact.y);
+            context.rotate(rocketAngle);
+            explosion.draw(context, this.exploding, LINEAR.ZERO, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
         } else {
+            context.translate(this.location.x, this.location.y);
+            context.rotate(rocketAngle);
             context.drawImage(rocket, -flameOffset, -rocketHeight * 0.5, ROCKET_LENGTH, rocketHeight);
         }
         context.restore();
@@ -53,8 +55,11 @@ var Player = (function () {
     
     Rocket.prototype.update = function(elapsed, platforms, particles, enemies, gravity) {
         if (this.exploding !== null) {
+            this.velocity.scale(0.5 * elapsed);
+            this.contact.addScaled(this.velocity, elapsed);
             if (explosion.updatePlayback(elapsed, this.exploding)) {
                 this.exploding = null;
+                console.log("Done exploding");
                 return false;
             }
             return true;
@@ -69,7 +74,7 @@ var Player = (function () {
         
         this.path.start.copy(this.lastLocation);
         this.path.end.copy(this.location);
-        this.path.extendAtEnd(ROCKET_LENGTH * 0.5);
+        this.path.extendAtEnd(ROCKET_LENGTH);
 
         var collidePlatform = null,
             collideEnemy = null,
@@ -89,7 +94,9 @@ var Player = (function () {
 
         if (collidePlatform !== null) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
+            this.velocity.set(0, 0);
             this.location = this.contact;
+            console.log("Rocket exploding");
         }
         return true;
     };
@@ -97,6 +104,8 @@ var Player = (function () {
     function Player(location) {
         this.location = location;
         this.swingDelta = 0;
+        
+        this.exploding = null;
         
         this.rockets = [];
     }
@@ -146,6 +155,10 @@ var Player = (function () {
         for (var r = 0; r < this.rockets.length; ++r) {
             this.rockets[r].draw(context);
         }
+        
+        if (this.exploding !== null) {
+            explosion.draw(context, this.exploding, new LINEAR.Vector(100, 100), EXPLOSION_SIZE, EXPLOSION_SIZE, true);
+        }
     };
     
     Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse) {
@@ -161,6 +174,10 @@ var Player = (function () {
             if (!this.rockets[r].update(elapsed, platforms, particles, enemies, gravity)) {
                 this.rockets.splice(r, 1);
             }
+        }
+        
+        if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
+            this.exploding = null;
         }
     };
     
