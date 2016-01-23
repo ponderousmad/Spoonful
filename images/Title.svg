@@ -18,7 +18,31 @@
    inkscape:version="0.91 r13725"
    sodipodi:docname="Title.svg">
   <defs
-     id="defs4" />
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4206">
+      <stop
+         style="stop-color:#c7cbd8;stop-opacity:1;"
+         offset="0"
+         id="stop4208" />
+      <stop
+         style="stop-color:#969db6;stop-opacity:1"
+         offset="1"
+         id="stop4210" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4206"
+       id="radialGradient4216"
+       cx="320.14313"
+       cy="587.03998"
+       fx="320.14313"
+       fy="587.03998"
+       r="117.85059"
+       gradientTransform="matrix(-0.52432717,-0.13940168,0.02755463,-0.10364035,482.60609,627.50204)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -90,7 +114,7 @@
        inkscape:connector-curvature="0"
        id="path4199"
        d="m 296.78571,514.93363 c -75.33209,-35.15282 -162.14286,8.21429 -162.14286,8.21429 l 0,-2 c 0,0 86.81077,-43.36711 162.14286,-8.21429 24.28572,4.53069 48.57143,4.1445 72.85715,1.07143 -0.74091,0.31916 -34.80479,18.68525 -72.85715,0.92857 z"
-       style="fill:#c7cbd8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:url(#radialGradient4216);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        inkscape:export-xdpi="180.6642"
        inkscape:export-ydpi="180.6642" />
   </g>
