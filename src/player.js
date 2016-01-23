@@ -53,13 +53,12 @@ var Player = (function () {
         context.restore();
     };
     
-    Rocket.prototype.update = function(elapsed, platforms, particles, enemies, gravity) {
+    Rocket.prototype.update = function(elapsed, buttonDown, platforms, particles, enemies, gravity) {
         if (this.exploding !== null) {
             this.velocity.scale(0.5 * elapsed);
             this.contact.addScaled(this.velocity, elapsed);
             if (explosion.updatePlayback(elapsed, this.exploding)) {
                 this.exploding = null;
-                console.log("Done exploding");
                 return false;
             }
             return true;
@@ -96,7 +95,9 @@ var Player = (function () {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
             this.velocity.set(0, 0);
             this.location = this.contact;
-            console.log("Rocket exploding");
+        } else if (!buttonDown) {
+            this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
+            this.contact = this.location;
         }
         return true;
     };
@@ -157,7 +158,8 @@ var Player = (function () {
         }
         
         if (this.exploding !== null) {
-            explosion.draw(context, this.exploding, new LINEAR.Vector(100, 100), EXPLOSION_SIZE, EXPLOSION_SIZE, true);
+            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -playerHeight * 0.5));
+            explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
         }
     };
     
@@ -167,11 +169,11 @@ var Player = (function () {
         
         if (mouse.leftDown) {
             console.log("Fire rocket");
-            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(.5, 0)));
+            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(.5, -0.5)));
         }
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
-            if (!this.rockets[r].update(elapsed, platforms, particles, enemies, gravity)) {
+            if (!this.rockets[r].update(elapsed, mouse.left, platforms, particles, enemies, gravity)) {
                 this.rockets.splice(r, 1);
             }
         }

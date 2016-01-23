@@ -89,10 +89,6 @@ var INPUT = (function (LINEAR) {
                 middle = (event.buttons & 4) == 4;
 
             self.location.set(event.clientX - bounds.left, event.clientY - bounds.top);
-
-            self.leftDown = self.leftDown || (self.left && !self.wasLeft);
-            self.middleDown = self.middleDown || (self.middle && !self.wasMiddle);
-            self.rightDown = self.rightDown || (self.right && !self.wasRight);
                       
             self.wasLeft = self.left;
             self.wasRight = self.right;
@@ -101,7 +97,11 @@ var INPUT = (function (LINEAR) {
             self.left = left;
             self.right = right;
             self.middle = middle;
-            
+
+            self.leftDown = self.leftDown || (self.left && !self.wasLeft);
+            self.middleDown = self.middleDown || (self.middle && !self.wasMiddle);
+            self.rightDown = self.rightDown || (self.right && !self.wasRight);            
+
             self.shift = event.shiftKey;
             self.ctrl = event.ctrlKey;
             self.altKey = event.altKey;
