@@ -9,7 +9,9 @@
             loader.load("backgroundStripe.png")
         ],
         platformImages = [
-        ];      
+        ],
+        playedSpoons = false,
+        spoonInstrument = new SoundEffect("audio/clicky.wav");
         
     
     // One time initialization code
@@ -72,6 +74,11 @@
     function update() {
         var now = getTimestamp(),
             elapsed = Math.min(now - lastTime, 32);
+            
+        if (!playedSpoons && spoonInstrument.isLoaded()) {
+            playedSpoons = true;
+            spoonInstrument.play();
+        }
             
         lastTime = now;
     }
