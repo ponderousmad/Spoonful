@@ -21,6 +21,7 @@
             new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550))
         ],
         gravity = new LINEAR.Vector(0, 0.0098),
+        player = new Player(new LINEAR.Vector(75, 550)),
         playedSpoons = false,
         spoonInstrument = new SoundEffect("audio/clicky.wav");
         
@@ -89,6 +90,8 @@
             platforms[f].draw(context);
         }
         
+        player.draw(context);
+        
         drawCentered(context, titleImage, 0, 0, width, height);
     }
     
@@ -106,6 +109,8 @@
         }
         
         particles.sort(PARTICLES.Ordering);
+        
+        player.update(elapsed);
             
         lastTime = now;
     }
