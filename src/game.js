@@ -19,7 +19,8 @@
             new PARTICLES.Particle(new LINEAR.Vector(35, 0), 2, 1)
         ],
         platforms = [
-            new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550))
+            new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
+            new PLATFORMS.Platform(new LINEAR.Vector(750, 0), new LINEAR.Vector(750, 550))
         ],
         enemies = [
         ],
