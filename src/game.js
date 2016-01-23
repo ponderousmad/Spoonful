@@ -6,7 +6,8 @@
         lastTime = 0,
         titleImage = loader.load("title.png"),
         backgroundTiles = [
-            loader.load("BackgroundStripe.png")
+            loader.load("BackgroundStripe.png"),
+            loader.load("BackgroundCubism.png")
         ],
         platformImages = [
         ],
@@ -77,7 +78,7 @@
         if (!loader.loaded) {
             return;
         }
-        var tile = backgroundTiles[0];
+        var tile = backgroundTiles[1];
         drawTiled(context, tile, width, height);
         
         for (var p = 0; p < particles.length; ++p) {
