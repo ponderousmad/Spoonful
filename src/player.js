@@ -243,7 +243,6 @@ var Player = (function () {
         }
         
         this.acceleration.add(gravity);
-        //this.acceleration.x = 0;
         
         if (!this.falling) {
             this.acceleration.y = Math.min(0, this.acceleration.y);
@@ -252,13 +251,14 @@ var Player = (function () {
             }
         }
         
-        if (this.acceleration.x != 0 || this.acceleration.y != 0) {
-            console.log("Accel: " + this.acceleration.x + ", " + this.acceleration.y);
-        }
-        
         this.lastLocation.copy(this.location);
         this.velocity.addScaled(this.acceleration, elapsed);
         this.location.addScaled(this.velocity, elapsed);
+        
+        if (this.location.y > 550) {
+            this.falling = false;
+            this.location.y = 550;
+        }
         
         if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
             this.exploding = null;
