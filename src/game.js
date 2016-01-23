@@ -25,7 +25,6 @@
         ],
         gravity = new LINEAR.Vector(0, 0.0098),
         player = new Player(new LINEAR.Vector(75, 550)),
-        spoonInstrument = new SoundEffect("audio/clicky.wav"),
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null;
         
