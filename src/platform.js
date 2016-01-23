@@ -5,6 +5,8 @@ var PLATFORMS = (function () {
         this.start = start.clone();
         this.end = end.clone();
         
+        this.segment = new LINEAR.Segment(this.start, this.end);
+        
         this.rise = end.y - start.y;
         this.run = end.x - start.x;
     }
@@ -35,6 +37,10 @@ var PLATFORMS = (function () {
     
     Platform.prototype.yForX = function (x) {
         return this.start.y + ((x - this.start.x) / this.run) * this.rise;
+    };
+    
+    Platform.prototype.intersect = function (segment, contact) {
+        return this.segment.findIntersection(segment, contact);
     };
     
     return {

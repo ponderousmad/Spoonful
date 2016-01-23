@@ -6,45 +6,92 @@ var Player = (function () {
         leg = loader.load("leg.png"),
         arm = loader.load("arm.png"),
         rocket = loader.load("rocket.png"),
+        explosion = new Flipbook(loader, "Explode", 8, 2),
         playerHeight = 200,
         legPivotHeight = playerHeight * 0.5,
         armPivotHeight = playerHeight * 0.78,
         MAX_LEG_SWING = Math.PI * 0.1,
         MAX_ARM_SWING = Math.PI * 0.03,
         DRAW_OFFSET = 5,
+        ROCKET_LENGTH = 50,
+        EXPLOSION_TIME_PER_FRAME = 80,
+        EXPLOSION_SIZE = 50,
         SWING_RATE = 0.005;
     
     loader.commit();
     
     function Rocket(location, velocity) {
         this.location = location.clone();
+        this.lastLocation = location.clone();
         this.velocity = velocity.clone();
         this.accel = 0.02;
         this.accelDirection = velocity.clone();
+        this.path = new LINEAR.Segment(this.lastLocation.clone(), this.location.clone());
+        this.exploding = null;
+        this.contact = new LINEAR.Vector(0, 0);
+        this.dead = false;
     }
     
     Rocket.prototype.draw = function(context) {
         if (!loader.loaded) {
             return;
         }
-        var rocketLength = 50,
-            flameOffset = 5,
-            rocketHeight = rocket.height * (rocketLength / rocket.width),
+        var flameOffset = 5,
+            rocketHeight = rocket.height * (ROCKET_LENGTH / rocket.width),
             rocketAngle = Math.atan2(this.velocity.y, this.velocity.x);
             
         context.save();
         context.translate(this.location.x, this.location.y);
         context.rotate(rocketAngle);
-        context.drawImage(rocket, -flameOffset, -rocketHeight * 0.5, rocketLength, rocketHeight);
+        if (this.exploding !== null) {
+            explosion.draw(context, this.exploding, this.contact, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
+        } else {
+            context.drawImage(rocket, -flameOffset, -rocketHeight * 0.5, ROCKET_LENGTH, rocketHeight);
+        }
         context.restore();
     };
     
     Rocket.prototype.update = function(elapsed, platforms, particles, enemies, gravity) {
+        if (this.exploding !== null) {
+            if (explosion.updatePlayback(elapsed, this.exploding)) {
+                this.exploding = null;
+                return false;
+            }
+            return true;
+        }
+        
+        this.lastLocation.copy(this.location);
         this.accelDirection.copy(this.velocity);
         this.accelDirection.normalize();
         this.velocity.addScaled(gravity, elapsed);
         this.velocity.addScaled(this.accelDirection, this.accel * elapsed);
         this.location.addScaled(this.velocity, elapsed);
+        
+        this.path.start.copy(this.lastLocation);
+        this.path.end.copy(this.location);
+        this.path.extendAtEnd(ROCKET_LENGTH * 0.5);
+
+        var collidePlatform = null,
+            collideEnemy = null,
+            closestCollisionSq = 0;
+        
+        for (var f = 0; f < platforms.length; ++f) {
+            var platform = platforms[f];
+            
+            if (platform.intersect(this.path, this.contact)) {
+                var contactDistance = LINEAR.pointDistanceSq(this.lastLocation, this.contact);
+                if (collidePlatform === null || contactDistance < closestCollisionSq) {
+                    collidePlatform = platform;
+                    closestCollisionSq = contactDistance;
+                }
+            }
+        }
+
+        if (collidePlatform !== null) {
+            this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
+            this.location = this.contact;
+        }
+        return true;
     };
     
     function Player(location) {
@@ -103,15 +150,17 @@ var Player = (function () {
     
     Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse) {
         this.swingDelta += elapsed;
-        this.location.x += elapsed * 0.1;
+        // this.location.x += elapsed * 0.1;
         
         if (mouse.leftDown) {
             console.log("Fire rocket");
-            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(.5, -.5)));
+            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(.5, 0)));
         }
         
-        for (var r = 0; r < this.rockets.length; ++r) {
-            this.rockets[r].update(elapsed, platforms, particles, enemies, gravity);
+        for (var r = this.rockets.length - 1; r >= 0 ; --r) {
+            if (!this.rockets[r].update(elapsed, platforms, particles, enemies, gravity)) {
+                this.rockets.splice(r, 1);
+            }
         }
     };
     
