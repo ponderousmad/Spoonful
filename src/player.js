@@ -7,13 +7,14 @@ var Player = (function () {
         arm = loader.load("arm.png"),
         spoon = loader.load("spoon.png"),
         playerHeight = 200,
-        legPivotHeight = playerHeight * 0.48,
+        legPivotHeight = playerHeight * 0.5,
         armPivotHeight = playerHeight * 0.78,
-        MAX_LEG_SWING = Math.PI * 0.2,
+        MAX_LEG_SWING = Math.PI * 0.1,
         MAX_ARM_SWING = Math.PI * 0.03,
         SPOON_OFFSET = new LINEAR.Vector(playerHeight * 0.25, playerHeight * 0.14),
         SPOON_LENGTH = playerHeight * 0.25,
         SPOON_IN_HAND = SPOON_LENGTH * 0.2,
+        DRAW_OFFSET = 5,
         SWING_RATE = 0.005;
     
     loader.commit();
@@ -35,10 +36,10 @@ var Player = (function () {
             torsoWidth = torso.width * scaleFactor,
             legWidth = leg.width * scaleFactor,
             legHeight = leg.height * scaleFactor,
-            legPivotY = this.location.y - legPivotHeight,
+            legPivotY = this.location.y - legPivotHeight + DRAW_OFFSET,
             armWidth = arm.width * scaleFactor,
             armHeight = arm.height * scaleFactor,
-            armPivotY = this.location.y - armPivotHeight,
+            armPivotY = this.location.y - armPivotHeight + DRAW_OFFSET,
             spoonHeight = spoon.height * (SPOON_LENGTH / spoon.width),
             swing = Math.sin(this.swingDelta * SWING_RATE);
             
@@ -54,7 +55,7 @@ var Player = (function () {
         context.drawImage(arm, -armWidth * 0.13, -1, armWidth, armHeight);
         context.restore();
         
-        context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - playerHeight, torsoWidth, torsoHeight);
+        context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - playerHeight + DRAW_OFFSET, torsoWidth, torsoHeight);
         
         context.save();
         context.translate(this.location.x, legPivotY);
