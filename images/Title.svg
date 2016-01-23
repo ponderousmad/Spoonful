@@ -21,6 +21,18 @@
      id="defs4">
     <linearGradient
        inkscape:collect="always"
+       id="linearGradient4218">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4220" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop4222" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
        id="linearGradient4206">
       <stop
          style="stop-color:#c7cbd8;stop-opacity:1;"
@@ -42,6 +54,15 @@
        r="117.85059"
        gradientTransform="matrix(-0.52432717,-0.13940168,0.02755463,-0.10364035,482.60609,627.50204)"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4218"
+       id="linearGradient4224"
+       x1="120.76312"
+       y1="491.79037"
+       x2="367.15073"
+       y2="491.79037"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -51,8 +72,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.8"
-     inkscape:cx="234.163"
-     inkscape:cy="593.41953"
+     inkscape:cx="205.79231"
+     inkscape:cy="544.03183"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -80,42 +101,64 @@
      inkscape:groupmode="layer"
      id="layer1">
     <text
+       inkscape:export-ydpi="252.67625"
+       inkscape:export-xdpi="252.67625"
+       sodipodi:linespacing="125%"
+       id="text4226"
+       style="font-style:normal;font-weight:normal;font-size:88.98754883px;line-height:125%;font-family:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#c2c8e4;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><textPath
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Gabriola;-inkscape-font-specification:Gabriola;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+         id="textPath4228"
+         xlink:href="#path4140"><tspan
+   id="tspan4230"
+   style="font-size:68.75px;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none">S</tspan><tspan
+   style="font-size:75px;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+   id="tspan4232">p</tspan><tspan
+   style="font-size:81.25px;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+   id="tspan4234">o</tspan><tspan
+   style="font-size:87.5px;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+   id="tspan4236">o</tspan><tspan
+   style="font-size:93.75px;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+   id="tspan4238">n</tspan><tspan
+   style="font-size:100px;fill-opacity:1;fill:#000000;stroke:#c2c8e4;stroke-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none"
+   id="tspan4240">ful</tspan></textPath></text>
+    <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:88.98754883px;line-height:125%;font-family:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:88.98754883px;line-height:125%;font-family:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;"
        id="text4136"
        sodipodi:linespacing="125%"
-       inkscape:export-xdpi="180.6642"
-       inkscape:export-ydpi="180.6642"><textPath
+       inkscape:export-xdpi="252.67625"
+       inkscape:export-ydpi="252.67625"><textPath
          xlink:href="#path4140"
          id="textPath4142"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Gabriola;-inkscape-font-specification:Gabriola"><tspan
-           style="font-size:68.75px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Gabriola;-inkscape-font-specification:Gabriola;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;"><tspan
+           style="font-size:68.75px;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;"
            id="tspan4147">S</tspan><tspan
            id="tspan4179"
-           style="font-size:75px">p</tspan><tspan
+           style="font-size:75px;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;">p</tspan><tspan
            id="tspan4183"
-           style="font-size:81.25px">o</tspan><tspan
+           style="font-size:81.25px;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;">o</tspan><tspan
            id="tspan4187"
-           style="font-size:87.5px">o</tspan><tspan
+           style="font-size:87.5px;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;">o</tspan><tspan
            id="tspan4191"
-           style="font-size:93.75px">n</tspan><tspan
+           style="font-size:93.75px;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;">n</tspan><tspan
            id="tspan4195"
-           style="font-size:100px">ful</tspan></textPath></text>
+           style="font-size:100px;fill-opacity:1;fill:#000000;stroke:none;stroke-opacity:1;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;">ful</tspan></textPath></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 134.64285,519.68363 c 0,0 84.1322,-43.72425 161.96429,-8.03571 38.17007,17.50221 72.29481,0.6763 73.03572,0.35714"
        id="path4140"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="csc"
-       inkscape:export-xdpi="180.6642"
-       inkscape:export-ydpi="180.6642" />
+       inkscape:export-xdpi="252.67625"
+       inkscape:export-ydpi="252.67625" />
     <path
        sodipodi:nodetypes="sccccs"
        inkscape:connector-curvature="0"
        id="path4199"
        d="m 296.78571,514.93363 c -75.33209,-35.15282 -162.14286,8.21429 -162.14286,8.21429 l 0,-2 c 0,0 86.81077,-43.36711 162.14286,-8.21429 24.28572,4.53069 48.57143,4.1445 72.85715,1.07143 -0.74091,0.31916 -34.80479,18.68525 -72.85715,0.92857 z"
        style="fill:url(#radialGradient4216);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-xdpi="180.6642"
-       inkscape:export-ydpi="180.6642" />
+       inkscape:export-xdpi="252.67625"
+       inkscape:export-ydpi="252.67625" />
   </g>
 </svg>
