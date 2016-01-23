@@ -10,6 +10,9 @@
         ],
         platformImages = [
         ],
+        particles = [],
+        platforms = [],
+        gravity = 9.8,
         playedSpoons = false,
         spoonInstrument = new SoundEffect("audio/clicky.wav");
         
@@ -79,6 +82,12 @@
             playedSpoons = true;
             spoonInstrument.play();
         }
+        
+        for (var p = 0; p < particles.length; ++p) {
+            particles[p].update(elapsed, particles, platforms, gravity);
+        }
+        
+        particles.sort(PARTICLES.Ordering);
             
         lastTime = now;
     }
