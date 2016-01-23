@@ -13,7 +13,9 @@
         particles = [
             new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1)
         ],
-        platforms = [],
+        platforms = [
+            new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550))
+        ],
         gravity = new LINEAR.Vector(0, 0.0098),
         playedSpoons = false,
         spoonInstrument = new SoundEffect("audio/clicky.wav");
@@ -74,9 +76,13 @@
         var tile = backgroundTiles[0];
         drawTiled(context, tile, width, height);
         
-        
         for (var p = 0; p < particles.length; ++p) {
             particles[p].draw(context);
+        }
+        
+        context.strokeStyle = "rgba(0,0,0,1)";
+        for (var f = 0; f < platforms.length; ++f) {
+            platforms[f].draw(context);
         }
         
         drawCentered(context, titleImage, 0, 0, width, height);
