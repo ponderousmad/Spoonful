@@ -13,13 +13,21 @@
     Flipbook.prototype.setupPlayback = function(frameTime) {
         return {
             elapsed: 0,
-            timePerFrame: frameTime
+            timePerFrame: frameTime,
+            fractionComplete: 0
         };
     };
     
     Flipbook.prototype.updatePlayback = function(elapsed, playback) {
         playback.elapsed += elapsed;
-        return playback.elapsed > (playback.timePerFrame * this.frames.length);
+        var totalLength = playback.timePerFrame * this.frames.length;
+        if (playback.elapsed > totalLength) {
+            playback.fractionComplete = 0;
+            return true;
+        } else {
+            playback.fractionComplete = playback.elapsed / totalLength;
+            return false;
+        }
     };
     
     Flipbook.prototype.draw = function(context, playback, location, width, height, center) {

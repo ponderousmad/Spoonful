@@ -11,17 +11,18 @@ var Player = (function () {
         explosion = new Flipbook(loader, "explode", 8, 2),
         launchSound = new SoundEffect("audio/launch.wav"),
         explodeSound = new SoundEffect("audio/explode.wav"),
-        playerHeight = 200,
-        legPivotHeight = playerHeight * 0.43,
-        armPivotHeight = playerHeight * 0.52,
-        gunPivotHeight = playerHeight * 0.55,
-        armOffset = playerHeight * 0.19,
+        PLAYER_HEIGHT = 200,
+        LEG_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.43,
+        ARM_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.52,
+        GUN_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.55,
+        ARM_OFFSET = PLAYER_HEIGHT * 0.19,
         MAX_LEG_SWING = Math.PI * 0.05,
         MAX_ARM_SWING = Math.PI * 0.04,
         DRAW_OFFSET = 0,
         ROCKET_LENGTH = 50,
         EXPLOSION_TIME_PER_FRAME = 80,
         EXPLOSION_SIZE = 50,
+        EXPLOSION_STRENGTH = 0.5,
         SWING_RATE = 0.005;
     
     loader.commit();
@@ -30,7 +31,7 @@ var Player = (function () {
         this.location = location.clone();
         this.lastLocation = location.clone();
         this.velocity = velocity.clone();
-        this.accel = 0.04;
+        this.acceleration = 0.04;
         this.accelDirection = velocity.clone();
         this.path = new LINEAR.Segment(this.lastLocation.clone(), this.location.clone());
         this.exploding = null;
@@ -59,7 +60,7 @@ var Player = (function () {
         context.restore();
     };
     
-    Rocket.prototype.update = function(elapsed, buttonDown, platforms, particles, enemies, gravity) {
+    Rocket.prototype.update = function(elapsed, buttonDown, player, platforms, particles, enemies, gravity) {
         if (this.exploding !== null) {
             this.lastLocation.copy(this.contact);
             this.velocity.scale(0.8);
@@ -77,11 +78,20 @@ var Player = (function () {
                     }
                 }
             }
-            
+
             if (explosion.updatePlayback(elapsed, this.exploding)) {
                 this.exploding = null;
                 return false;
             }
+            
+            var blastForce = LINEAR.subVectors(player.centroid, this.contact),
+                distanceSq = blastForce.length(),
+                distance = Math.sqrt(distanceSq),
+                attenuation = 1.0 - this.exploding.fractionComplete;
+
+            blastForce.scale(EXPLOSION_STRENGTH * Math.pow(attenuation, 12) / (distance * distanceSq));
+            player.acceleration.add(blastForce);
+            
             return true;
         }
         
@@ -89,9 +99,9 @@ var Player = (function () {
         this.accelDirection.copy(this.velocity);
         this.accelDirection.normalize();
         this.velocity.addScaled(gravity, elapsed);
-        this.velocity.addScaled(this.accelDirection, this.accel * elapsed);
+        this.velocity.addScaled(this.accelDirection, this.acceleration * elapsed);
         this.location.addScaled(this.velocity, elapsed);
-        this.accel *= elapsed / 40;
+        this.acceleration *= elapsed / 40;
         
         this.path.start.copy(this.lastLocation);
         this.path.end.copy(this.location);
@@ -132,9 +142,15 @@ var Player = (function () {
     };
     
     function Player(location) {
-        this.location = location;
+        this.location = location.clone();
+        this.lastLocation = location.clone();
+        this.centroid = location.clone();
+        this.path = new LINEAR.Segment(this.lastLocation.clone(), this.location.clone());
         this.swingDelta = 0;
         this.gunAngle = 0;
+        this.falling = false;
+        this.velocity = new LINEAR.Vector(0, 0)
+        this.acceleration = new LINEAR.Vector(0, 0);
         
         this.exploding = null;
         
@@ -146,18 +162,18 @@ var Player = (function () {
             return;
         }
         
-        var torsoHeight = playerHeight * 0.68,
+        var torsoHeight = PLAYER_HEIGHT * 0.68,
             scaleFactor = torsoHeight / torso.height,
             torsoWidth = torso.width * scaleFactor,
             legWidth = leftLeg.width * scaleFactor,
             legHeight = leftLeg.height * scaleFactor,
-            legPivotY = this.location.y - legPivotHeight + DRAW_OFFSET,
+            legPivotY = this.location.y - LEG_PIVOT_HEIGHT + DRAW_OFFSET,
             armWidth = arm.width * scaleFactor,
             armHeight = arm.height * scaleFactor,
-            armPivotY = this.location.y - armPivotHeight + DRAW_OFFSET,
+            armPivotY = this.location.y - ARM_PIVOT_HEIGHT + DRAW_OFFSET,
             gunWidth = gun.width * scaleFactor,
             gunHeight = gun.height * scaleFactor,
-            gunPivotY = this.location.y - gunPivotHeight + DRAW_OFFSET,
+            gunPivotY = this.location.y - GUN_PIVOT_HEIGHT + DRAW_OFFSET,
             swing = Math.sin(this.swingDelta * SWING_RATE);
             
         context.save();
@@ -172,10 +188,10 @@ var Player = (function () {
         context.drawImage(rightLeg, -legWidth * 0.8, -2, legWidth, legHeight);
         context.restore();
 
-        context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - playerHeight + DRAW_OFFSET, torsoWidth, torsoHeight);
+        context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - PLAYER_HEIGHT + DRAW_OFFSET, torsoWidth, torsoHeight);
                 
         context.save();
-        context.translate(this.location.x + armOffset, armPivotY);
+        context.translate(this.location.x + ARM_OFFSET, armPivotY);
         context.rotate(Math.PI * 0.1 - MAX_ARM_SWING * swing);
         context.drawImage(arm, -armWidth * 0.5, -armWidth * 0.5, armWidth, armHeight);
         context.restore();
@@ -191,15 +207,19 @@ var Player = (function () {
         }
         
         if (this.exploding !== null) {
-            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -playerHeight * 0.5));
+            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
             explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
         }
     };
     
     Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse) {
-        this.swingDelta += elapsed;
+        if (this.falling) {
+            this.swingDelta += elapsed;
+        } else {
+            this.swingDelta *= 0.3;
+        }
 
-        var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -gunPivotHeight)),
+        var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -GUN_PIVOT_HEIGHT)),
             direction = LINEAR.subVectors(mouse.location, source);
         
         direction.scale(0.01);
@@ -212,11 +232,33 @@ var Player = (function () {
             launchSound.play();
         }
         
+        this.centroid.copy(this.location);
+        this.centroid.y -= PLAYER_HEIGHT * .5;
+        this.acceleration.set(0,0);
+        
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
-            if (!this.rockets[r].update(elapsed, mouse.left, platforms, particles, enemies, gravity)) {
+            if (!this.rockets[r].update(elapsed, mouse.left, this, platforms, particles, enemies, gravity)) {
                 this.rockets.splice(r, 1);
             }
         }
+        
+        this.acceleration.add(gravity);
+        //this.acceleration.x = 0;
+        
+        if (!this.falling) {
+            this.acceleration.y = Math.min(0, this.acceleration.y);
+            if (this.acceleration.y < 0) {
+                this.falling = true;
+            }
+        }
+        
+        if (this.acceleration.x != 0 || this.acceleration.y != 0) {
+            console.log("Accel: " + this.acceleration.x + ", " + this.acceleration.y);
+        }
+        
+        this.lastLocation.copy(this.location);
+        this.velocity.addScaled(this.acceleration, elapsed);
+        this.location.addScaled(this.velocity, elapsed);
         
         if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
             this.exploding = null;
