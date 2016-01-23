@@ -5,6 +5,7 @@ var Player = (function () {
         torso = loader.load("torso.png"),
         leg = loader.load("leg.png"),
         arm = loader.load("arm.png"),
+        rocket = loader.load("rocket.png"),
         playerHeight = 200,
         legPivotHeight = playerHeight * 0.5,
         armPivotHeight = playerHeight * 0.78,
@@ -15,9 +16,31 @@ var Player = (function () {
     
     loader.commit();
     
+    function Rocket(location, velocity) {
+        this.location = location.clone();
+        this.velocity = velocity.clone();
+    }
+    
+    Rocket.prototype.draw = function(context) {
+        if (!loader.loaded) {
+            return;
+        }
+        var rocketLength = 25,
+            flameOffset = 5,
+            rocketHeight = rocketLength / rocket.width;
+        context.drawImage(rocket, this.location.x - flameOffset, this.location.y - rocketHeight * 0.5, rocketLength, rocketHeight);
+    };
+    
+    Rocket.prototype.update = function(elapsed, platforms, particles, enemies, gravity) {
+        this.velocity.addScaled(gravity, elapsed);
+        this.location.addScaled(this.velocity, elapsed);
+    };
+    
     function Player(location) {
         this.location = location;
         this.swingDelta = 0;
+        
+        this.rockets = [];
     }
     
     Player.prototype.draw = function (context) {
@@ -61,11 +84,24 @@ var Player = (function () {
         context.rotate(-MAX_ARM_SWING * swing);
         context.drawImage(arm, -armWidth * 0.13, -1, armWidth, armHeight);
         context.restore();
+        
+        for (var r = 0; r < this.rockets.length; ++r) {
+            this.rockets[r].draw(context);
+        }
     };
     
-    Player.prototype.update = function (elapsed) {
+    Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse) {
         this.swingDelta += elapsed;
         this.location.x += elapsed * 0.1;
+        
+        if (mouse.leftDown) {
+            console.log("Fire rocket");
+            this.rockets.push(new Rocket(LINEAR.addVectors(this.location, new LINEAR.Vector(5, -armPivotHeight)), new LINEAR.Vector(1, 0)));
+        }
+        
+        for (var r = 0; r < this.rockets.length; ++r) {
+            this.rockets[r].update(elapsed, platforms, particles, enemies, gravity);
+        }
     };
     
     return Player;

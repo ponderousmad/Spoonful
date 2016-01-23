@@ -21,9 +21,13 @@
         platforms = [
             new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550))
         ],
+        enemies = [
+        ],
         gravity = new LINEAR.Vector(0, 0.0098),
         player = new Player(new LINEAR.Vector(75, 550)),
-        spoonInstrument = new SoundEffect("audio/clicky.wav");
+        spoonInstrument = new SoundEffect("audio/clicky.wav"),
+        keyboardState = new INPUT.KeyboardState(window),
+        mouseState = null;
         
     
     // One time initialization code
@@ -100,12 +104,15 @@
             elapsed = Math.min(now - lastTime, 32);
         
         for (var p = 0; p < particles.length; ++p) {
-            particles[p].update(elapsed, particles, platforms, gravity);
+            particles[p].update(elapsed, platforms, particles, enemies, gravity);
         }
         
         particles.sort(PARTICLES.Ordering);
         
-        player.update(elapsed);
+        player.update(elapsed, platforms, particles, enemies, gravity, keyboardState, mouseState);
+
+        keyboardState.postUpdate();
+        mouseState.postUpdate();
             
         lastTime = now;
     }
@@ -114,6 +121,8 @@
         console.log("window.onload", e, Date.now());
         var canvas = document.getElementById("canvas"),
             context = canvas.getContext("2d");
+            
+        mouseState = new INPUT.MouseState(canvas);
     
         function drawFrame() {
             requestAnimationFrame(drawFrame);

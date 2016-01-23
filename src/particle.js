@@ -17,7 +17,7 @@ var PARTICLES = (function () {
         this.support = null;
     }
     
-    Particle.prototype.update = function (elapsed, particles, platforms, gravity) {
+    Particle.prototype.update = function (elapsed, platforms, particles, enemies, gravity) {
         if (this.support === null) {
             this.velocity.addScaled(gravity, elapsed);
         }
