@@ -23,6 +23,7 @@
         ],
         enemies = [
         ],
+        drawTitle = 2000,
         gravity = new LINEAR.Vector(0, 0.0098),
         player = new Player(new LINEAR.Vector(75, 550)),
         keyboardState = new INPUT.KeyboardState(window),
@@ -95,7 +96,15 @@
         
         player.draw(context);
         
-        drawCentered(context, titleImage, 0, 0, width, height);
+        if (drawTitle > 0) {
+            context.save();
+            var FADE_TIME = 1000;
+            if (drawTitle < FADE_TIME) {
+                context.globalAlpha = drawTitle / FADE_TIME;
+            }
+            drawCentered(context, titleImage, 0, 0, width, height);
+            context.restore();
+        }
     }
     
     function update() {
@@ -112,7 +121,8 @@
 
         keyboardState.postUpdate();
         mouseState.postUpdate();
-            
+
+        drawTitle -= elapsed;
         lastTime = now;
     }
     
