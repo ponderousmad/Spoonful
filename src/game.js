@@ -6,7 +6,7 @@
         lastTime = 0,
         titleImage = loader.load("title.png"),
         backgroundTiles = [
-            loader.load("backgroundStripe.png")
+            loader.load("BackgroundStripe.png")
         ],
         platformImages = [
         ],
