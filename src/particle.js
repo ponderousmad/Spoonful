@@ -9,24 +9,52 @@ var PARTICLES = (function () {
     loader.commit();
     
     function Particle(location, radius, mass) {
-        this.location = location;
+        this.location = location.clone();
+        this.lastLocation = location.clone();
         this.radius = radius;
         this.mass = mass;        
         this.velocity = new LINEAR.Vector(0, 0);
-        this.falling = true;
+        this.support = null;
     }
     
     Particle.prototype.update = function (elapsed, particles, platforms, gravity) {
+        if (this.support === null) {
+            this.velocity.addScaled(gravity, elapsed);
+        }
+        
         for (var p = 0; p < particles.length; ++p) {
             if (particles[p].isBelow(this.location)) {
                 var particle = particles[p];
             }
         }
         
-        if (this.falling) {
-            this.velocity.addScaled(gravity, elapsed);
-            this.location.addScaled(this.velocity, elapsed);
+        var highestPlatform = null,
+            highestPlatformHeight = 0;
+        
+        for (var f = 0; f < platforms.length; ++f) {
+            if (platforms[f].isBelow(this.location)) {
+                var platform = platforms[f],
+                    platformHeight = platform.yForX(this.location.x);
+                
+                if (highestPlatform == null || platformHeight < highestPlatformHeight) {
+                    highestPlatform = platform;
+                    highestPlatformHeight = platformHeight;
+                }
+            }
         }
+        
+        if (this.support === null) {
+            if (highestPlatform != null && highestPlatformHeight < (this.location.y + this.radius + this.velocity.y * elapsed)) {
+                this.support = highestPlatform;
+                this.location.y = highestPlatformHeight - this.radius;
+                this.velocity.set(0, 0);
+            }
+        } else {
+            this.velocity.set(0, 0);
+        }
+        
+        this.location.addScaled(this.velocity, elapsed);
+        this.lastLocation.copy(this.location);
     };
     
     Particle.prototype.isBelow = function (location) {
@@ -40,7 +68,7 @@ var PARTICLES = (function () {
     Particle.prototype.draw = function (context) {
         if (loader.loaded) {
             var size = 2 * this.radius;
-            context.drawImage(images[0], this.location.x, this.location.y, size, size);
+            context.drawImage(images[0], this.location.x - this.radius, this.location.y - this.radius, size, size);
         }
     };
     
