@@ -24,6 +24,7 @@ var Player = (function () {
         this.swingDelta = 0;
         this.spoonAngle = -Math.PI * 0.5;
         this.spoonFlipped = true;
+        this.armOffsetAngle = Math.PI * 0.1;
     }
     
     Player.prototype.draw = function (context) {
@@ -51,7 +52,7 @@ var Player = (function () {
         
         context.save();
         context.translate(this.location.x, armPivotY);
-        context.rotate(MAX_ARM_SWING * swing);
+        context.rotate(MAX_ARM_SWING * swing + this.armOffsetAngle);
         context.drawImage(arm, -armWidth * 0.13, -1, armWidth, armHeight);
         context.restore();
         
@@ -65,7 +66,7 @@ var Player = (function () {
                 
         context.save();
         context.translate(this.location.x, armPivotY);
-        context.rotate(-MAX_ARM_SWING * swing);
+        context.rotate(-MAX_ARM_SWING * swing + this.armOffsetAngle);
         context.save();
         context.translate(SPOON_OFFSET.x, SPOON_OFFSET.y);
         context.rotate(this.spoonAngle);
