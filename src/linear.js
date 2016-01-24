@@ -62,6 +62,10 @@ var LINEAR = (function () {
     Vector.prototype.dot = function (v) {
         return this.x * v.x + this.y * v.y;
     };
+    
+    Vector.prototype.toString = function () {
+        return "(" + this.x + ", " + this.y + ")";
+    };
 
     linear.scaleVector = function (p, s) {
         return new Vector(p.x * s, p.y * s);
