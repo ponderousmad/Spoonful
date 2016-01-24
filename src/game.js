@@ -27,6 +27,7 @@
         drawTitle = 2000,
         gravity = new LINEAR.Vector(0, 0.0098),
         player = new Player(new LINEAR.Vector(75, 550)),
+        drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null;
         
@@ -50,11 +51,16 @@
         lastTime = getTimestamp();
     })();
         
-    function drawTiled(context, tile, width, height) {
-        var tileX = 0,
-            tileY = 0,
-            spanX = tile.width,
-            spanY = tile.height;
+    function drawTiled(context, tile, location, width, height) {
+        var spanX = tile.width,
+            spanY = tile.height,
+            tileAlignedX = spanX * Math.floor(location.x / spanX),
+            tileAlignedY = spanY * Math.floor(location.y / spanY),
+            tileX = 0,
+            tileY = 0;
+        
+        width += location.x - tileAlignedX;
+        height += location.y - tileAlignedY;
         
         while (tileY < height) {
             if (tileY + spanY > width) {
@@ -64,7 +70,7 @@
                 if (tileX + spanY > width) {
                     spanX = width - tileX;
                 }
-                context.drawImage(tile, 0, 0, spanX, spanY, tileX, tileY, spanX, spanY);
+                context.drawImage(tile, 0, 0, spanX, spanY, tileX + tileAlignedX, tileY + tileAlignedY, spanX, spanY);
                 tileX += tile.width;
             }
             spanX = tile.width;
@@ -83,9 +89,14 @@
         if (!loader.loaded) {
             return;
         }
-        var tile = backgroundTiles[1];
-        drawTiled(context, tile, width, height);
         
+        drawOffset.set(player.centroid.x - width * 0.5, player.centroid.y - height * 0.5);
+
+        context.save();
+        context.translate(-drawOffset.x, -drawOffset.y);
+        var tile = backgroundTiles[1];
+        drawTiled(context, tile, drawOffset, width, height);
+
         for (var p = 0; p < particles.length; ++p) {
             particles[p].draw(context);
         }
@@ -96,6 +107,7 @@
         }
         
         player.draw(context);
+        context.restore();
         
         if (drawTitle > 0) {
             context.save();
@@ -118,7 +130,7 @@
         
         particles.sort(PARTICLES.Ordering);
         
-        player.update(elapsed, platforms, particles, enemies, gravity, keyboardState, mouseState);
+        player.update(elapsed, platforms, particles, enemies, gravity, keyboardState, mouseState, drawOffset);
 
         keyboardState.postUpdate();
         mouseState.postUpdate();

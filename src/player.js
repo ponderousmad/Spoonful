@@ -24,11 +24,11 @@ var Player = (function () {
         DRAW_OFFSET = 0,
         ROCKET_LENGTH = 50,
         ROCKET_FLAME_OFFSET = 5,
-        INITIAL_ROCKET_ACCELERATION = 0.04,
+        INITIAL_ROCKET_ACCELERATION = 0.02,
         ROCKET_VELOCITY_SCALE = 0.01,
         ROCKET_ACCEL_DECAY = 0.025,
         EXPLOSION_TIME_PER_FRAME = 80,
-        EXPLOSION_SIZE = 50,
+        EXPLOSION_SIZE = 100,
         EXPLOSION_STRENGTH = 500.0,
         EXPLOSION_AIR_RESISTANCE = 0.015,
         MAX_BLAST_FORCE = 0.04,
@@ -227,7 +227,7 @@ var Player = (function () {
         }
     };
     
-    Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse) {
+    Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse, drawOffset) {
         if (this.falling) {
             this.swingDelta += elapsed;
         } else {
@@ -235,7 +235,7 @@ var Player = (function () {
         }
 
         var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -GUN_PIVOT_HEIGHT)),
-            direction = LINEAR.subVectors(mouse.location, source);
+            direction = LINEAR.subVectors(LINEAR.addVectors(mouse.location, drawOffset), source);
         
         direction.scale(ROCKET_VELOCITY_SCALE);
         
