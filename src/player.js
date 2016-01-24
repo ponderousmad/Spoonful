@@ -28,6 +28,10 @@ var Player = (function () {
     loader.commit();
     
     function Player(location) {
+        this.reset(location);
+    }
+    
+    Player.prototype.reset = function(location) {
         this.location = location.clone();
         this.centroid = location.clone();
         this.path = new LINEAR.Segment(location.clone(), location.clone());
@@ -43,7 +47,7 @@ var Player = (function () {
         this.teleport = null;
         
         this.rockets = [];
-    }
+    };
     
     function drawImageTransformed(context, image, x, y, angle, xOffset, yOffset, width, height) {
         context.save();
