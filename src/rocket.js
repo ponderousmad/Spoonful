@@ -13,6 +13,7 @@ var Rocket = (function () {
         EXPLOSION_SIZE = 100,
         EXPLOSION_STRENGTH = 400.0,
         EXPLOSION_AIR_RESISTANCE = 0.015,
+        FATAL_BLAST = 0.03,
         MAX_BLAST_FORCE = 0.03;
     
     loader.commit();
@@ -60,6 +61,20 @@ var Rocket = (function () {
         return blastForce;
     };
     
+    Rocket.prototype.blastEnemies = function (elapsed, environment) {
+        for (var e = 0; e < environment.enemies.length; ++e) {
+            var enemy = environment.enemies[e];
+            if (!enemy.dead) {
+                var blastForce = this.blastForceAt(enemy.location);
+                if (blastForce.lengthSq() > FATAL_BLAST * FATAL_BLAST) {
+                    enemy.kill();
+                } else {
+                    enemy.velocity.addScaled(blastForce, elapsed);
+                }
+            }
+        }
+    }
+    
     Rocket.prototype.update = function (elapsed, buttonDown, environment) {
         var self = this;
         
@@ -84,6 +99,8 @@ var Rocket = (function () {
             }
             
             environment.player.acceleration.add(this.blastForceAt(environment.player.centroid));
+            
+            this.blastEnemies(elapsed, environment);
             return true;
         }
         
@@ -97,7 +114,8 @@ var Rocket = (function () {
         this.path.end.copy(this.location);
         this.path.extendAtEnd(ROCKET_LENGTH);
 
-        var collidePlatform = null;
+        var collidePlatform = null,
+            collide = false;
         
         environment.closestPlatformIntersection(this.path, function(platform, intersection) {
             collidePlatform = platform;
@@ -105,15 +123,28 @@ var Rocket = (function () {
         });
 
         if (collidePlatform !== null) {
-            this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
+            collide = true;
             this.velocity.set(0, 0);
             this.location.copy(this.contact);
         } else if (!buttonDown) {
-            this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
+            collide = true;
             this.contact.copy(this.location);
+        } else {
+            for (var e = 0; e < environment.enemies.length; ++e) {
+                var enemy = environment.enemies[e];
+                if (enemy.isAlive()) {
+                    var closest = this.path.closestPoint(enemy.location);
+                    if (LINEAR.pointDistanceSq(closest.point, enemy.location) < enemy.radius * enemy.radius) {
+                        collide = true;
+                        this.contact.copy(closest.point);
+                        this.velocity.set(0, 0);
+                    }
+                }
+            }
         }
         
-        if (this.exploding !== null) {
+        if (collide) {
+            this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
             explodeSound.play();
         }
         

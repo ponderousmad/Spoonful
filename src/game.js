@@ -17,7 +17,7 @@
         mouseState = null,
         MAX_LEVELS = 3,
         environment = {
-            level: 0,
+            level: 1,
             particles: [],
             platforms: [],
             enemies: [
