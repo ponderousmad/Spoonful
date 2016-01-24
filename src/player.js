@@ -20,12 +20,22 @@ var Player = (function () {
         LEG_OFFSET = 0.2,
         MAX_LEG_SWING = Math.PI * 0.05,
         MAX_ARM_SWING = Math.PI * 0.04,
+        ARM_BASE_ANGLE = Math.PI * 0.1,
         DRAW_OFFSET = 0,
         ROCKET_LENGTH = 50,
+        ROCKET_FLAME_OFFSET = 5,
+        INITIAL_ROCKET_ACCELERATION = 0.04,
+        ROCKET_VELOCITY_SCALE = 0.01,
+        ROCKET_ACCEL_DECAY = 0.025,
         EXPLOSION_TIME_PER_FRAME = 80,
         EXPLOSION_SIZE = 50,
         EXPLOSION_STRENGTH = 500.0,
-        SWING_RATE = 0.005;
+        EXPLOSION_AIR_RESISTANCE = 0.015,
+        MAX_BLAST_FORCE = 0.04,
+        SWING_RATE = 0.005,
+        FLAIL_DAMPEN_FACTOR = 0.3,
+        PLAYER_WIND_RESTANCE = 0.005,
+        PLAYER_FRICTION = 0.015;
     
     loader.commit();
     
@@ -33,7 +43,7 @@ var Player = (function () {
         this.location = location.clone();
         this.lastLocation = location.clone();
         this.velocity = velocity.clone();
-        this.acceleration = 0.04;
+        this.acceleration = INITIAL_ROCKET_ACCELERATION;
         this.accelDirection = velocity.clone();
         this.path = new LINEAR.Segment(this.lastLocation.clone(), this.location.clone());
         this.exploding = null;
@@ -45,7 +55,7 @@ var Player = (function () {
         if (!loader.loaded) {
             return;
         }
-        var flameOffset = 5,
+        var flameOffset = ROCKET_FLAME_OFFSET,
             rocketHeight = rocket.height * (ROCKET_LENGTH / rocket.width),
             rocketAngle = Math.atan2(this.velocity.y, this.velocity.x);
             
@@ -62,16 +72,27 @@ var Player = (function () {
         context.restore();
     };
     
-    Rocket.prototype.update = function(elapsed, buttonDown, player, platforms, particles, enemies, gravity) {
+    Rocket.prototype.blastForceAt = function (location) {
+        var blastForce = LINEAR.subVectors(location, this.contact),
+            distanceSq = blastForce.lengthSq(),
+            distance = Math.sqrt(distanceSq),
+            attenuation = 1.0 - this.exploding.fractionComplete,
+            strength = EXPLOSION_STRENGTH * Math.pow(attenuation, 2) / distanceSq;
+
+        blastForce.scale(Math.min(strength, MAX_BLAST_FORCE) / distance);
+        return blastForce;
+    };
+    
+    Rocket.prototype.update = function (elapsed, buttonDown, player, platforms, particles, enemies, gravity) {
         if (this.exploding !== null) {
             this.lastLocation.copy(this.contact);
-            this.velocity.scale(0.8);
+            this.velocity.scale(1.0 - EXPLOSION_AIR_RESISTANCE * elapsed);
             this.contact.addScaled(this.velocity, elapsed);
             
             this.path.start.copy(this.lastLocation);
             this.path.end.copy(this.contact);
             
-            if (this.path.length() > 0.5) {
+            if (this.path.length() > 0.5) { // No need to worry about low velocity explosions.
                 this.path.extendBoth(5);
                 for (var i = 0; i < platforms.length; ++i) {
                     if (platforms[i].intersect(this.path, this.location)) {
@@ -86,14 +107,7 @@ var Player = (function () {
                 return false;
             }
             
-            var blastForce = LINEAR.subVectors(player.centroid, this.contact),
-                distanceSq = blastForce.lengthSq(),
-                distance = Math.sqrt(distanceSq),
-                attenuation = 1.0 - this.exploding.fractionComplete;
-
-            blastForce.scale(EXPLOSION_STRENGTH * Math.pow(attenuation, 2) / (distance * distanceSq));
-            player.acceleration.add(blastForce);
-            
+            player.acceleration.add(this.blastForceAt(player.centroid));
             return true;
         }
         
@@ -103,7 +117,7 @@ var Player = (function () {
         this.velocity.addScaled(gravity, elapsed);
         this.velocity.addScaled(this.accelDirection, this.acceleration * elapsed);
         this.location.addScaled(this.velocity, elapsed);
-        this.acceleration *= elapsed / 40;
+        this.acceleration *= elapsed * ROCKET_ACCEL_DECAY;
         
         this.path.start.copy(this.lastLocation);
         this.path.end.copy(this.location);
@@ -133,7 +147,6 @@ var Player = (function () {
         } else if (!buttonDown) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
             this.contact.copy(this.location);
-            this.velocity.scale(0.4);
         }
         
         if (this.exploding !== null) {
@@ -194,7 +207,7 @@ var Player = (function () {
                 
         context.save();
         context.translate(this.location.x + ARM_OFFSET, armPivotY);
-        context.rotate(Math.PI * 0.1 - MAX_ARM_SWING * swing);
+        context.rotate(ARM_BASE_ANGLE - MAX_ARM_SWING * swing);
         context.drawImage(arm, -armWidth * 0.5, -armWidth * 0.5, armWidth, armHeight);
         context.restore();
        
@@ -218,13 +231,13 @@ var Player = (function () {
         if (this.falling) {
             this.swingDelta += elapsed;
         } else {
-            this.swingDelta *= 0.3;
+            this.swingDelta *= FLAIL_DAMPEN_FACTOR;
         }
 
         var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -GUN_PIVOT_HEIGHT)),
             direction = LINEAR.subVectors(mouse.location, source);
         
-        direction.scale(0.01);
+        direction.scale(ROCKET_VELOCITY_SCALE);
         
         this.gunAngle = Math.atan2(direction.y, direction.x);
         
@@ -257,10 +270,10 @@ var Player = (function () {
         
         if (this.falling) {
             // Wind resistance.
-            this.velocity.x *= 0.9;
+            this.velocity.x *= (1.0 - PLAYER_WIND_RESTANCE * elapsed);
         } else {
             // Friction.
-            this.velocity.x *= 0.5;
+            this.velocity.x *= (1.0 - PLAYER_FRICTION * elapsed);
         }
         
         if (this.location.y > 550) {
