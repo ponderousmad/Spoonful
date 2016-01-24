@@ -36,7 +36,7 @@ var PARTICLES = (function () {
                 var platform = platforms[f],
                     platformHeight = platform.yForX(this.location.x);
                 
-                if (highestPlatform == null || platformHeight < highestPlatformHeight) {
+                if (highestPlatform === null || platformHeight < highestPlatformHeight) {
                     highestPlatform = platform;
                     highestPlatformHeight = platformHeight;
                 }
@@ -44,7 +44,7 @@ var PARTICLES = (function () {
         }
         
         if (this.support === null) {
-            if (highestPlatform != null && highestPlatformHeight < (this.location.y + this.radius + this.velocity.y * elapsed)) {
+            if (highestPlatform !== null && highestPlatformHeight < (this.location.y + this.radius + this.velocity.y * elapsed)) {
                 this.support = highestPlatform;
                 this.location.y = highestPlatformHeight - this.radius;
                 this.velocity.set(0, 0);
