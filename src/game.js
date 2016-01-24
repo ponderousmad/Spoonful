@@ -15,8 +15,6 @@
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null,
-        PORTAL_SPIN = Math.PI * 0.001,
-        PORTAL_SIZE = 125,
         environment = {
             particles: [],
             platforms: [
@@ -32,6 +30,8 @@
             portal: new LINEAR.Vector(650, 30),
             portalAngle: 0,
             portalDraw: portalFrames.setupPlayback(80, true),
+            PORTAL_SPIN: Math.PI * 0.001,
+            PORTAL_SIZE: 125,
             gravity: new LINEAR.Vector(0, 0.0098),
             player: new Player(new LINEAR.Vector(400, 550)),
         };
@@ -100,7 +100,7 @@
         context.save();
         context.translate(this.portal.x, this.portal.y);
         context.rotate(this.portalAngle);
-        portalFrames.draw(context, this.portalDraw, LINEAR.ZERO, PORTAL_SIZE, PORTAL_SIZE, true);
+        portalFrames.draw(context, this.portalDraw, LINEAR.ZERO, this.PORTAL_SIZE, this.PORTAL_SIZE, true);
         context.restore();
 
         for (var p = 0; p < this.particles.length; ++p) {
@@ -126,7 +126,7 @@
         this.player.update(elapsed, this, keyboardState, mouseState, drawOffset);
         
         portalFrames.updatePlayback(elapsed, this.portalDraw);
-        this.portalAngle += elapsed * PORTAL_SPIN;
+        this.portalAngle += elapsed * this.PORTAL_SPIN;
     };
     
     environment.intersectPlatforms = function(segment, onIntersect) {
@@ -197,6 +197,10 @@
             }
         }
         return bound;
+    };
+    
+    environment.teleport = function() {
+        return null;
     };
     
     function draw(context, width, height) {

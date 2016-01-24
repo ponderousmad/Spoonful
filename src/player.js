@@ -40,6 +40,7 @@ var Player = (function () {
         this.width = PLAYER_HEIGHT; // temporary value, need images to determine.
         
         this.exploding = null;
+        this.teleport = null;
         
         this.rockets = [];
     }
@@ -118,20 +119,7 @@ var Player = (function () {
         this.centroid.y -= PLAYER_HEIGHT * 0.5;
     };
     
-    Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
-        if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
-            this.exploding = null;
-            return;
-        }
-        
-        var self = this;
-        
-        if (this.freefall) {
-            this.swingDelta += elapsed;
-        } else {
-            this.swingDelta *= FLAIL_DAMPEN_FACTOR;
-        }
-
+    Player.prototype.updateRockets = function (elapsed, environment, mouse, drawOffset) {
         var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -GUN_PIVOT_HEIGHT)),
             direction = LINEAR.subVectors(LINEAR.addVectors(mouse.location, drawOffset), source);
         
@@ -139,19 +127,22 @@ var Player = (function () {
         
         this.gunAngle = Math.atan2(direction.y, direction.x);
         
-        if (mouse.leftDown) {
+        if (mouse.leftDown && this.teleport === null) {
             this.rockets.push(new Rocket(source, direction));
             launchSound.play();
         }
         
         this.updateCentroid();
         this.acceleration.set(0, 0);
-        
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
             if (!this.rockets[r].update(elapsed, mouse.left, environment)) {
                 this.rockets.splice(r, 1);
             }
         }
+    };
+    
+    Player.prototype.updatePhysics = function (elapsed, environment) {
+        var self = this;
         
         this.acceleration.add(environment.gravity);
         
@@ -238,7 +229,7 @@ var Player = (function () {
                 }
             }, function(platform, intersection) {
                 return platform != skipPlatform; 
-            });
+            });            
         }
         
         if (this.freefall) {
@@ -258,6 +249,28 @@ var Player = (function () {
             this.velocity.x *= (1.0 - PLAYER_FRICTION * elapsed);
         }
         this.updateCentroid();
+    };
+    
+    Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
+        if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
+            this.exploding = null;
+            return;
+        }
+        
+        if (this.freefall) {
+            this.swingDelta += elapsed;
+        } else {
+            this.swingDelta *= FLAIL_DAMPEN_FACTOR;
+        }
+        
+        this.updateRockets(elapsed, environment, mouse, drawOffset);
+        
+        this.updatePhysics(elapsed, environment);
+        
+        var portalDistance = LINEAR.pointDistance(this.centroid, environment.portal);
+        if (portalDistance < environment.PORTAL_SIZE) {
+            this.teleport = environment.teleport();
+        }
     };
     
     return Player;
