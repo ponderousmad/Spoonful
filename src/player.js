@@ -24,7 +24,7 @@ var Player = (function () {
         ROCKET_LENGTH = 50,
         EXPLOSION_TIME_PER_FRAME = 80,
         EXPLOSION_SIZE = 50,
-        EXPLOSION_STRENGTH = 0.5,
+        EXPLOSION_STRENGTH = 500.0,
         SWING_RATE = 0.005;
     
     loader.commit();
@@ -87,11 +87,11 @@ var Player = (function () {
             }
             
             var blastForce = LINEAR.subVectors(player.centroid, this.contact),
-                distanceSq = blastForce.length(),
+                distanceSq = blastForce.lengthSq(),
                 distance = Math.sqrt(distanceSq),
                 attenuation = 1.0 - this.exploding.fractionComplete;
 
-            blastForce.scale(EXPLOSION_STRENGTH * Math.pow(attenuation, 12) / (distance * distanceSq));
+            blastForce.scale(EXPLOSION_STRENGTH * Math.pow(attenuation, 2) / (distance * distanceSq));
             player.acceleration.add(blastForce);
             
             return true;
@@ -246,7 +246,6 @@ var Player = (function () {
         this.acceleration.add(gravity);
         
         if (!this.falling) {
-            this.acceleration.y = Math.min(0, this.acceleration.y);
             if (this.acceleration.y < 0) {
                 this.falling = true;
             }
@@ -254,12 +253,20 @@ var Player = (function () {
         
         this.lastLocation.copy(this.location);
         this.velocity.addScaled(this.acceleration, elapsed);
-        this.velocity.x *= 0.5;
         this.location.addScaled(this.velocity, elapsed);
+        
+        if (this.falling) {
+            // Wind resistance.
+            this.velocity.x *= 0.9;
+        } else {
+            // Friction.
+            this.velocity.x *= 0.5;
+        }
         
         if (this.location.y > 550) {
             this.falling = false;
             this.location.y = 550;
+            this.velocity.set(0, 0);
         }
         
         if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
