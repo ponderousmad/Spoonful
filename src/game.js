@@ -18,13 +18,7 @@
         PORTAL_SPIN = Math.PI * 0.001,
         PORTAL_SIZE = 125,
         environment = {
-            particles: [
-                new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1),
-                new PARTICLES.Particle(new LINEAR.Vector(23, 10), 5, 1),
-                new PARTICLES.Particle(new LINEAR.Vector(25, 0), 4, 1),
-                new PARTICLES.Particle(new LINEAR.Vector(30, 0), 3, 1),
-                new PARTICLES.Particle(new LINEAR.Vector(35, 0), 2, 1)
-            ],
+            particles: [],
             platforms: [
                 new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
                 new PLATFORMS.Platform(new LINEAR.Vector(500, 100), new LINEAR.Vector(800, 100)),
