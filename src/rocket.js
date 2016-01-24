@@ -61,7 +61,7 @@ var Rocket = (function () {
         return blastForce;
     };
     
-    Rocket.prototype.update = function (elapsed, buttonDown, player, environment) {
+    Rocket.prototype.update = function (elapsed, buttonDown, environment) {
         if (this.exploding !== null) {
             this.lastLocation.copy(this.contact);
             this.velocity.scale(1.0 - EXPLOSION_AIR_RESISTANCE * elapsed);
@@ -85,7 +85,7 @@ var Rocket = (function () {
                 return false;
             }
             
-            player.acceleration.add(this.blastForceAt(player.centroid));
+            environment.player.acceleration.add(this.blastForceAt(environment.player.centroid));
             return true;
         }
         

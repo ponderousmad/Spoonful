@@ -122,7 +122,7 @@ var Player = (function () {
         this.acceleration.set(0, 0);
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
-            if (!this.rockets[r].update(elapsed, mouse.left, this, environment)) {
+            if (!this.rockets[r].update(elapsed, mouse.left, environment)) {
                 this.rockets.splice(r, 1);
             }
         }

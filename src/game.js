@@ -11,6 +11,10 @@
         ],
         platformImages = [
         ],
+        drawTitle = 2000,
+        drawOffset = new LINEAR.Vector(0, 0),
+        keyboardState = new INPUT.KeyboardState(window),
+        mouseState = null,        
         environment = {
             particles: [
                 new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1),
@@ -25,13 +29,9 @@
             ],
             enemies: [
             ],
-            gravity: new LINEAR.Vector(0, 0.0098)
-        },
-        drawTitle = 2000,
-        player = new Player(new LINEAR.Vector(75, 550)),
-        drawOffset = new LINEAR.Vector(0, 0),
-        keyboardState = new INPUT.KeyboardState(window),
-        mouseState = null;
+            gravity: new LINEAR.Vector(0, 0.0098),
+            player: new Player(new LINEAR.Vector(75, 550)),
+        };
         
     
     // One time initialization code
@@ -92,7 +92,7 @@
             return;
         }
         
-        drawOffset.set(player.centroid.x - width * 0.5, player.centroid.y - height * 0.5);
+        drawOffset.set(environment.player.centroid.x - width * 0.5, environment.player.centroid.y - height * 0.5);
 
         context.save();
         context.translate(-drawOffset.x, -drawOffset.y);
@@ -108,7 +108,7 @@
             environment.platforms[f].draw(context);
         }
         
-        player.draw(context);
+        environment.player.draw(context);
         context.restore();
         
         if (drawTitle > 0) {
@@ -132,7 +132,7 @@
         
         environment.particles.sort(PARTICLES.Ordering);
         
-        player.update(elapsed, environment, keyboardState, mouseState, drawOffset);
+        environment.player.update(elapsed, environment, keyboardState, mouseState, drawOffset);
 
         keyboardState.postUpdate();
         mouseState.postUpdate();
