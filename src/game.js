@@ -32,6 +32,8 @@
             portalDraw: portalFrames.setupPlayback(80, true),
             PORTAL_SPIN: Math.PI * 0.001,
             PORTAL_SIZE: 125,
+            TELEPORT_TIME: 1000,
+            teleportLeft: 0,
             gravity: new LINEAR.Vector(0, 0.0098),
             player: new Player(new LINEAR.Vector(400, 550)),
         };
@@ -200,7 +202,13 @@
     };
     
     environment.teleport = function() {
-        return null;
+        this.teleportLeft = this.TELEPORT_TIME;
+        return this.teleportLeft / this.TELEPORT_TIME;
+    };
+    
+    environment.updateTeleport = function(elapsed) {
+        this.teleportLeft -= elapsed;
+        return Math.max(0, this.teleportLeft / this.TELEPORT_TIME);
     };
     
     function draw(context, width, height) {

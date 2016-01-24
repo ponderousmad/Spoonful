@@ -105,7 +105,12 @@ var Player = (function () {
             var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
             explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
         } else {
+            context.save();
+            if (this.teleport != null) {
+                context.globalAlpha = this.teleport;
+            }
             this.drawBody(context);
+            context.restore();
         }
         
         // Draw rockets/explosions over the player.
@@ -145,7 +150,7 @@ var Player = (function () {
         var self = this;
         
         this.acceleration.add(environment.gravity);
-        
+       
         if (!this.freefall) {
             if (this.acceleration.y < 0) {
                 this.freefall = true;
@@ -153,8 +158,15 @@ var Player = (function () {
         }
 
         this.path.start.copy(this.location);
-        this.velocity.addScaled(this.acceleration, elapsed);
+        this.velocity.addScaled(this.acceleration, elapsed);      
         this.location.addScaled(this.velocity, elapsed);
+        
+        if (this.teleport != null) {
+            var teleportFeet = environment.portal.clone();
+            teleportFeet.y -= PLAYER_HEIGHT * 0.5;
+            this.location.scale(this.teleport);
+            this.location.addScaled(teleportFeet, 1.0 - this.teleport);
+        }
         
         var skipPlatform = null,
             slid = false,
@@ -197,10 +209,6 @@ var Player = (function () {
         
         this.path.end.copy(this.location);
         
-        // if the velocity dot platform normal is pos/neg, project location onto platform, then
-        // intersect that path to check for horizontal intersections.
-        // Still need to deal with player width as well.
-
         while (checkIntersections && (slid || this.freefall || this.support === null)) {
             this.updateCentroid();
             var offset = this.path.end.x - this.path.start.x,
@@ -267,9 +275,13 @@ var Player = (function () {
         
         this.updatePhysics(elapsed, environment);
         
-        var portalDistance = LINEAR.pointDistance(this.centroid, environment.portal);
-        if (portalDistance < environment.PORTAL_SIZE) {
-            this.teleport = environment.teleport();
+        if (this.teleport === null) {
+            var portalDistance = LINEAR.pointDistance(this.centroid, environment.portal);
+            if (portalDistance < environment.PORTAL_SIZE) {
+                this.teleport = environment.teleport();
+            }
+        } else {
+            this.teleport = environment.updateTeleport(elapsed);
         }
     };
     
