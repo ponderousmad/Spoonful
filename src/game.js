@@ -17,17 +17,9 @@
         mouseState = null,
         environment = {
             particles: [],
-            platforms: [
-                new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
-                new PLATFORMS.Platform(new LINEAR.Vector(500, 100), new LINEAR.Vector(800, 100)),
-                new PLATFORMS.Platform(new LINEAR.Vector(0, 300), new LINEAR.Vector(400, 300)),
-                new PLATFORMS.Platform(new LINEAR.Vector(750, 600), new LINEAR.Vector(750, -300)),
-                new PLATFORMS.Platform(new LINEAR.Vector(50, -300), new LINEAR.Vector(50, 600)),
-                new PLATFORMS.Platform(new LINEAR.Vector(800, -250), new LINEAR.Vector(0, -250))
-            ],
-            enemies: [
-            ],
-            portal: new LINEAR.Vector(650, 30),
+            platforms: [],
+            enemies: [],
+            portal: new LINEAR.Vector(0, 0),
             portalAngle: 0,
             portalDraw: portalFrames.setupPlayback(80, true),
             PORTAL_SPIN: Math.PI * 0.001,
@@ -35,7 +27,7 @@
             TELEPORT_TIME: 1000,
             teleportLeft: 0,
             gravity: new LINEAR.Vector(0, 0.0098),
-            player: new Player(new LINEAR.Vector(400, 550)),
+            player: new Player(new LINEAR.Vector(0, 0)),
             loading: false
         };
     
