@@ -229,17 +229,17 @@ var LINEAR = (function () {
             }
 
             // There is overlap if the start or end of segment 2 is in segment 1, or if segment 2 contains all of segment 1.
-            if (inSegmentPD(start1, d1, start2)) {
+            if (linear.inSegmentPD(start1, d1, start2)) {
                 intersection.copy(start2);
                 return true;
             }
-            if (inSegmentPD(start1, d1, linear.addVectors(start2, d2))) {
+            if (linear.inSegmentPD(start1, d1, linear.addVectors(start2, d2))) {
                 intersection.copy(start2);
                 intersection.add(d2);
                 return true;
             }
 
-            if (inSegmentPD(start2, d2, start1)) {
+            if (linear.inSegmentPD(start2, d2, start1)) {
                 return true;
             }
             return false;
