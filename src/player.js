@@ -12,10 +12,12 @@ var Player = (function () {
         launchSound = new SoundEffect("audio/launch.wav"),
         explodeSound = new SoundEffect("audio/explode.wav"),
         PLAYER_HEIGHT = 200,
+        TORSO_SCALE = 0.67,
         LEG_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.43,
         ARM_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.52,
         GUN_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.55,
         ARM_OFFSET = PLAYER_HEIGHT * 0.19,
+        LEG_OFFSET = 0.2,
         MAX_LEG_SWING = Math.PI * 0.05,
         MAX_ARM_SWING = Math.PI * 0.04,
         DRAW_OFFSET = 0,
@@ -162,7 +164,7 @@ var Player = (function () {
             return;
         }
         
-        var torsoHeight = PLAYER_HEIGHT * 0.68,
+        var torsoHeight = PLAYER_HEIGHT * TORSO_SCALE,
             scaleFactor = torsoHeight / torso.height,
             torsoWidth = torso.width * scaleFactor,
             legWidth = leftLeg.width * scaleFactor,
@@ -177,15 +179,15 @@ var Player = (function () {
             swing = Math.sin(this.swingDelta * SWING_RATE);
             
         context.save();
-        context.translate(this.location.x + legWidth * 0.2, legPivotY);
+        context.translate(this.location.x + legWidth * LEG_OFFSET, legPivotY);
         context.rotate(MAX_LEG_SWING * swing);
-        context.drawImage(leftLeg, -legWidth * 0.2, -2, legWidth, legHeight);
+        context.drawImage(leftLeg, -legWidth * LEG_OFFSET, 0, legWidth, legHeight);
         context.restore();
 
         context.save();
-        context.translate(this.location.x - legWidth * 0.2, legPivotY);
+        context.translate(this.location.x - legWidth * LEG_OFFSET, legPivotY);
         context.rotate(-MAX_LEG_SWING * swing);
-        context.drawImage(rightLeg, -legWidth * 0.8, -2, legWidth, legHeight);
+        context.drawImage(rightLeg, -legWidth * (1 - LEG_OFFSET), 0, legWidth, legHeight);
         context.restore();
 
         context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - PLAYER_HEIGHT + DRAW_OFFSET, torsoWidth, torsoHeight);
@@ -227,14 +229,13 @@ var Player = (function () {
         this.gunAngle = Math.atan2(direction.y, direction.x);
         
         if (mouse.leftDown) {
-            console.log("Fire rocket");
             this.rockets.push(new Rocket(source, direction));
             launchSound.play();
         }
         
         this.centroid.copy(this.location);
         this.centroid.y -= PLAYER_HEIGHT * .5;
-        this.acceleration.set(0,0);
+        this.acceleration.set(0, 0);
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
             if (!this.rockets[r].update(elapsed, mouse.left, this, platforms, particles, enemies, gravity)) {
@@ -253,6 +254,7 @@ var Player = (function () {
         
         this.lastLocation.copy(this.location);
         this.velocity.addScaled(this.acceleration, elapsed);
+        this.velocity.x *= 0.5;
         this.location.addScaled(this.velocity, elapsed);
         
         if (this.location.y > 550) {
