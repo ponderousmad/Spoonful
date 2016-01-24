@@ -10,17 +10,21 @@
         }
     }
     
-    Flipbook.prototype.setupPlayback = function(frameTime) {
+    Flipbook.prototype.setupPlayback = function(frameTime, loop) {
         return {
             elapsed: 0,
             timePerFrame: frameTime,
-            fractionComplete: 0
+            fractionComplete: 0,
+            loop: loop == true
         };
     };
     
     Flipbook.prototype.updatePlayback = function(elapsed, playback) {
-        playback.elapsed += elapsed;
         var totalLength = playback.timePerFrame * this.frames.length;
+        playback.elapsed += elapsed;
+        if(playback.loop) {
+            playback.elapsed = playback.elapsed % totalLength;
+        }
         if (playback.elapsed > totalLength) {
             playback.fractionComplete = 0;
             return true;

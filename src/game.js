@@ -10,10 +10,13 @@
             loader.load("BackgroundCubism.png"),
             loader.load("BackgroundTan.png")
         ],
+        portalFrames = new Flipbook(loader, "portal", 16, 2),
         drawTitle = 2000,
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
-        mouseState = null,        
+        mouseState = null,
+        PORTAL_SPIN = Math.PI * 0.001,
+        PORTAL_SIZE = 150,
         environment = {
             particles: [
                 new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1),
@@ -24,12 +27,16 @@
             ],
             platforms: [
                 new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
+                new PLATFORMS.Platform(new LINEAR.Vector(500, 300), new LINEAR.Vector(800, 300)),
                 new PLATFORMS.Platform(new LINEAR.Vector(750, 600), new LINEAR.Vector(750, 0)),
                 new PLATFORMS.Platform(new LINEAR.Vector(50, 0), new LINEAR.Vector(50, 600)),
                 new PLATFORMS.Platform(new LINEAR.Vector(800, 50), new LINEAR.Vector(0, 50))
             ],
             enemies: [
             ],
+            portal: new LINEAR.Vector(650, 200),
+            portalAngle: 0,
+            portalDraw: portalFrames.setupPlayback(80, true),
             gravity: new LINEAR.Vector(0, 0.0098),
             player: new Player(new LINEAR.Vector(400, 550)),
         };
@@ -94,6 +101,12 @@
         context.translate(-drawOffset.x, -drawOffset.y);
         var tile = backgroundTiles[2];
         drawTiled(context, tile, drawOffset, width, height);
+        
+        context.save();
+        context.translate(this.portal.x, this.portal.y);
+        context.rotate(this.portalAngle);
+        portalFrames.draw(context, this.portalDraw, LINEAR.ZERO, PORTAL_SIZE, PORTAL_SIZE, true);
+        context.restore();
 
         for (var p = 0; p < this.particles.length; ++p) {
             this.particles[p].draw(context);
@@ -116,6 +129,9 @@
         this.particles.sort(PARTICLES.Ordering);
         
         this.player.update(elapsed, this, keyboardState, mouseState, drawOffset);
+        
+        portalFrames.updatePlayback(elapsed, this.portalDraw);
+        this.portalAngle += elapsed * PORTAL_SPIN;
     };
     
     environment.intersectPlatforms = function(segment, onIntersect) {
