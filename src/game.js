@@ -7,7 +7,8 @@
         titleImage = loader.load("title.png"),
         backgroundTiles = [
             loader.load("BackgroundStripe.png"),
-            loader.load("BackgroundCubism.png")
+            loader.load("BackgroundCubism.png"),
+            loader.load("BackgroundTan.png")
         ],
         drawTitle = 2000,
         drawOffset = new LINEAR.Vector(0, 0),
@@ -23,8 +24,8 @@
             ],
             platforms: [
                 new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
-                new PLATFORMS.Platform(new LINEAR.Vector(750, 0), new LINEAR.Vector(750, 600)),
-                new PLATFORMS.Platform(new LINEAR.Vector(50, 600), new LINEAR.Vector(50, 0)),
+                new PLATFORMS.Platform(new LINEAR.Vector(750, 600), new LINEAR.Vector(750, 0)),
+                new PLATFORMS.Platform(new LINEAR.Vector(50, 0), new LINEAR.Vector(50, 600)),
                 new PLATFORMS.Platform(new LINEAR.Vector(800, 50), new LINEAR.Vector(0, 50))
             ],
             enemies: [
@@ -91,7 +92,7 @@
 
         context.save();
         context.translate(-drawOffset.x, -drawOffset.y);
-        var tile = backgroundTiles[1];
+        var tile = backgroundTiles[2];
         drawTiled(context, tile, drawOffset, width, height);
 
         for (var p = 0; p < this.particles.length; ++p) {

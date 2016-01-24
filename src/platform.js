@@ -3,7 +3,11 @@ var PLATFORMS = (function () {
     
     var loader = new ImageBatch("images/"),
         images = [
-        ];
+            loader.load("girder.png")
+        ],
+        TYPES = {
+            Girder: 0
+        };
         
     loader.commit();
     
@@ -15,14 +19,34 @@ var PLATFORMS = (function () {
         
         this.rise = end.y - start.y;
         this.run = end.x - start.x;
+        
+        this.type = TYPES.Girder;
     }
     
     Platform.prototype.draw = function (context) {
-        context.beginPath();
-        // Draw using pixel centers.
-        context.moveTo(this.start.x - 0.5, this.start.y + 0.5);
-        context.lineTo(this.end.x + 0.5, this.end.y + 0.5);
-        context.stroke();
+        if (!loader.loaded) {
+            context.beginPath();
+            // Draw using pixel centers.
+            context.moveTo(this.start.x - 0.5, this.start.y + 0.5);
+            context.lineTo(this.end.x + 0.5, this.end.y + 0.5);
+            context.stroke();
+            return;
+        }
+        var image = images[this.type],
+            length = this.segment.length(),
+            offset = 0,
+            angle = Math.atan2(this.rise, this.run);
+
+        context.save();
+        context.translate(this.start.x, this.start.y);
+        context.rotate(angle);
+        while (length > 0) {
+            var width = Math.min(length, image.width);
+            context.drawImage(image, 0, 0, width, image.height, offset, 0, width, image.height);
+            length -= width;
+            offset += width;
+        }
+        context.restore();
     };
     
     Platform.prototype.isBelow = function (location, radius) {
