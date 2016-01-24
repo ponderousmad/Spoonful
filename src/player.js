@@ -301,5 +301,8 @@ var Player = (function () {
         }
     };
     
+    Player.prototype.kill = function (environment) {
+    };
+    
     return Player;
 }());

@@ -8,6 +8,8 @@ var Enemy = (function () {
         explosion = new Flipbook(loader, "boom", 8, 2),
         EXPLOSION_SIZE = 100,
         EXPLOSION_TIME_PER_FRAME = 80,
+        FOLLOW_DISTANCE = 250,
+        ATTACK_RANGE = 50,
         boomSound = new SoundEffect("audio/boom.wav"),
         Types = {
             Glider: 0
@@ -77,19 +79,33 @@ var Enemy = (function () {
             }            
             return;
         }
-        
-        var next = this.path[this.waypoint],
-            speed = this.speed(),
-            travel = speed * elapsed;
-        
-        this.direction.copy(next);
+
+        this.direction.copy(environment.player.centroid);
         this.direction.sub(this.location);
+        
+        var travel = this.speed() * elapsed,
+            playerDistance = this.direction.lengthSq(),
+            attackPlayer = false;
+
+        if (playerDistance < FOLLOW_DISTANCE * FOLLOW_DISTANCE) {
+            attackPlayer = true;
+            if (playerDistance < ATTACK_RANGE * ATTACK_RANGE) {
+                this.kill();
+                environment.player.kill();
+            }
+        } else {
+            this.direction.copy(this.path[this.waypoint]);
+            this.direction.sub(this.location);
+        }
+        
         this.angle = Math.atan2(this.direction.y, this.direction.x);
                
         var distance = this.direction.length();
         if (distance < travel) {
             travel = distance;
-            this.waypoint = (this.waypoint + 1) % this.path.length;
+            if (!attackPlayer) {
+                this.waypoint = (this.waypoint + 1) % this.path.length;
+            }
         }
         
         this.location.addScaled(this.direction, travel/distance);
