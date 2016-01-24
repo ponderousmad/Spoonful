@@ -150,6 +150,18 @@ var Player = (function () {
         }
     };
     
+    Player.prototype.wallBound = function (elapsed, environment) {
+        var offset = this.path.end.x - this.path.start.x,
+            bound = environment.wallCheck(this.centroid, this.width * 0.5, offset);
+            
+        if (bound !== null) {
+            this.location.x = bound;
+            this.path.end.x = bound;
+            this.velocity.x = 0;
+            this.acceleration.x = 0;
+        }
+    }
+    
     Player.prototype.updatePhysics = function (elapsed, environment) {
         var self = this;
         
@@ -160,9 +172,12 @@ var Player = (function () {
                 this.freefall = true;
             }
         }
-
+        
         this.path.start.copy(this.location);
-        this.velocity.addScaled(this.acceleration, elapsed);      
+        this.velocity.addScaled(this.acceleration, elapsed);
+        if (environment.wallCheck(this.centroid, this.width * 0.5, this.velocity.x) !== null) {
+            this.velocity.x = 0;
+        }
         this.location.addScaled(this.velocity, elapsed);
         
         if (this.teleport != null) {
@@ -215,13 +230,7 @@ var Player = (function () {
         
         while (checkIntersections && (slid || this.freefall || this.support === null)) {
             this.updateCentroid();
-            var offset = this.path.end.x - this.path.start.x,
-                bound = environment.wallCheck(this.centroid, this.width * 0.5, offset);
-                
-            if (bound !== null) {
-                this.location.x = bound;
-                this.path.end.x = bound;
-            }               
+            this.wallBound(elapsed, environment);
             
             checkIntersections = false;
             environment.closestPlatformIntersection(this.path, function(platform, intersection) {
@@ -232,6 +241,9 @@ var Player = (function () {
                     self.location.copy(intersection);
                 } else {
                     checkIntersections = self.velocity.y != 0;
+                    if(!checkIntersections) {
+                        self.wallBound(elapsed, environment);
+                    }
                     self.location.x = intersection.x;
                     self.path.end.x = self.location.x;
                     skipPlatform = platform;
