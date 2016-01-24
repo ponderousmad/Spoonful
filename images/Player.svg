@@ -919,10 +919,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="139.40426"
-     inkscape:cy="509.47732"
+     inkscape:cx="-103.93897"
+     inkscape:cy="623.68753"
      inkscape:document-units="px"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer4"
      showgrid="false"
      showguides="false"
      inkscape:window-width="1920"
@@ -1042,8 +1042,8 @@
        style="display:inline;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
        transform="translate(-247.14286,5.7142857)"
        inkscape:export-filename="D:\github\ponderous-mad\appengine\spoonful\images\rightLeg.png"
-       inkscape:export-xdpi="48.684868"
-       inkscape:export-ydpi="48.684868">
+       inkscape:export-xdpi="8.9200001"
+       inkscape:export-ydpi="8.9200001">
       <path
          style="fill:url(#radialGradient5086);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m 314.7793,605.76172 c -20.02972,0.0415 -51.0004,-2.66142 -63.37891,18.41016 -51.67244,87.96049 -44.56756,157.32009 -44.41421,181.36703 0.25956,40.70063 35.97159,134.23777 48.61929,155.88882 l 83.5957,0 c -15.36479,-63.1866 -23.64468,-135.33218 -23.64468,-135.33218 0,0 36.05996,-72.7874 53.72867,-106.90024 33.4343,-74.36982 -3.3188,-113.53966 -54.50586,-113.43359 z"
@@ -1075,8 +1075,8 @@
        id="g5094"
        style="display:inline;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none"
        inkscape:export-filename="D:\github\ponderous-mad\appengine\spoonful\images\leftLeg.png"
-       inkscape:export-xdpi="48.684868"
-       inkscape:export-ydpi="48.684868">
+       inkscape:export-xdpi="8.9200001"
+       inkscape:export-ydpi="8.9200001">
       <g
          id="g5096"
          style="stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none">
@@ -1109,7 +1109,7 @@
       </g>
     </g>
     <ellipse
-       style="display:inline;opacity:1;fill:url(#linearGradient5120);fill-opacity:1;stroke:#000000;stroke-width:2.02737609;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:url(#linearGradient5120);fill-opacity:1;stroke:#000000;stroke-width:2.02737617;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="ellipse5118"
        cx="-812.72131"
        cy="609.62885"
@@ -1117,8 +1117,8 @@
        ry="115.36446"
        transform="matrix(-0.96570696,0.25963449,0.03049731,0.99953485,0,0)"
        inkscape:export-filename="D:\github\ponderous-mad\appengine\spoonful\images\leftUpper.png"
-       inkscape:export-xdpi="48.684868"
-       inkscape:export-ydpi="48.684868" />
+       inkscape:export-xdpi="8.9200001"
+       inkscape:export-ydpi="8.9200001" />
   </g>
   <g
      inkscape:label="torso"
@@ -1227,8 +1227,8 @@
     </g>
     <g
        id="g5220"
-       inkscape:export-xdpi="46.473549"
-       inkscape:export-ydpi="46.473549">
+       inkscape:export-xdpi="8.9184408"
+       inkscape:export-ydpi="8.9184408">
       <ellipse
          inkscape:export-ydpi="48.684868"
          inkscape:export-xdpi="48.684868"
@@ -1464,8 +1464,8 @@
     <g
        id="g5142"
        transform="translate(121.42857,-329.99999)"
-       inkscape:export-xdpi="48.684868"
-       inkscape:export-ydpi="48.684868">
+       inkscape:export-xdpi="8.9200001"
+       inkscape:export-ydpi="8.9200001">
       <path
          style="opacity:1;fill:url(#linearGradient5152);fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m -8.30725,417.66023 c 75.97629,4.01168 128.17088,3.10933 128.21702,-35.13383 0.0477,-39.50675 -52.20587,-38.5136 -128.21702,-35.22793 -62.0846,2.68368 -102.32071,-3.4275 -102.50534,35.22793 -0.18462,38.65544 40.44927,31.85718 102.50534,35.13383 z"
