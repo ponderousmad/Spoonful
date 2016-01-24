@@ -119,6 +119,27 @@
         PLATFORMS.intersect(this.platforms, segment, onIntersect)
     };
     
+    environment.closestPlatformIntersection = function(segment, onClosest, filter) {
+        var closestPlatform = null,
+            closestDistanceSq = 0,
+            closestIntersection = new LINEAR.Vector(0,0);
+        
+        this.intersectPlatforms(segment, function(platform, intersection) {
+            if (filter && !filter(platform, intersection)) {
+                return;
+            }
+            var contactDistance = LINEAR.pointDistanceSq(segment.start, intersection);
+            if (closestPlatform === null || contactDistance < closestDistanceSq) {
+                closestPlatform = platform;
+                closestDistanceSq = contactDistance;
+                closestIntersection.copy(intersection);
+            }
+        });
+        if (closestPlatform !== null) {
+            onClosest(closestPlatform, closestIntersection, closestDistanceSq);
+        }
+    };
+    
     function draw(context, width, height) {
         if (!loader.loaded) {
             return;

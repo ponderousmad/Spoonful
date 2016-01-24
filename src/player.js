@@ -29,14 +29,14 @@ var Player = (function () {
     
     function Player(location) {
         this.location = location.clone();
-        this.lastLocation = location.clone();
         this.centroid = location.clone();
-        this.path = new LINEAR.Segment(this.lastLocation.clone(), this.location.clone());
+        this.path = new LINEAR.Segment(location.clone(), location.clone());
         this.swingDelta = 0;
         this.gunAngle = 0;
         this.falling = false;
         this.velocity = new LINEAR.Vector(0, 0);
         this.acceleration = new LINEAR.Vector(0, 0);
+        this.support = null;
         
         this.exploding = null;
         
@@ -51,21 +51,7 @@ var Player = (function () {
         context.restore();
     }
     
-    Player.prototype.draw = function (context) {
-        if (!loader.loaded) {
-            return;
-        }
-        
-        for (var r = 0; r < this.rockets.length; ++r) {
-            this.rockets[r].draw(context);
-        }
-        
-        if (this.exploding !== null) {
-            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
-            explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
-            return;
-        }
-        
+    Player.prototype.drawBody = function (context) {
         var torsoHeight = PLAYER_HEIGHT * TORSO_SCALE,
             scaleFactor = torsoHeight / torso.height,
             torsoWidth = torso.width * scaleFactor,
@@ -107,7 +93,32 @@ var Player = (function () {
         );
     };
     
+    Player.prototype.draw = function (context) {
+        if (!loader.loaded) {
+            return;
+        }
+        
+        if (this.exploding !== null) {
+            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
+            explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
+        } else {
+            this.drawBody(context);
+        }
+        
+        // Draw rockets/explosions over the player.
+        for (var r = 0; r < this.rockets.length; ++r) {
+            this.rockets[r].draw(context);
+        }
+    };
+    
     Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
+        if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
+            this.exploding = null;
+            return;
+        }
+        
+        var self = this;
+        
         if (this.falling) {
             this.swingDelta += elapsed;
         } else {
@@ -143,27 +154,31 @@ var Player = (function () {
                 this.falling = true;
             }
         }
-        
-        this.lastLocation.copy(this.location);
+
+        this.path.start.copy(this.location);
         this.velocity.addScaled(this.acceleration, elapsed);
         this.location.addScaled(this.velocity, elapsed);
+        this.path.end.copy(this.location);
+        
+        environment.closestPlatformIntersection(this.path, function(platform, intersection) {
+            self.falling = false;
+            self.support = platform;
+            self.velocity.set(0, 0);
+            self.location.copy(intersection);
+        }, function(platform, intersection) {
+            return self.velocity.y >= 0 || platform != self.support; 
+        });
         
         if (this.falling) {
+            this.support = null;
+        }
+        
+        if (this.support === null) {
             // Wind resistance.
             this.velocity.x *= (1.0 - PLAYER_WIND_RESTANCE * elapsed);
         } else {
             // Friction.
             this.velocity.x *= (1.0 - PLAYER_FRICTION * elapsed);
-        }
-        
-        if (this.location.y > 550) {
-            this.falling = false;
-            this.location.y = 550;
-            this.velocity.set(0, 0);
-        }
-        
-        if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
-            this.exploding = null;
         }
     };
     

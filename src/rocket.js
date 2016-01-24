@@ -19,11 +19,10 @@ var Rocket = (function () {
     
     function Rocket(location, velocity) {
         this.location = location.clone();
-        this.lastLocation = location.clone();
         this.velocity = velocity.clone();
         this.acceleration = INITIAL_ROCKET_ACCELERATION;
         this.accelDirection = velocity.clone();
-        this.path = new LINEAR.Segment(this.lastLocation.clone(), this.location.clone());
+        this.path = new LINEAR.Segment(location.clone(), location.clone());
         this.exploding = null;
         this.contact = new LINEAR.Vector(0, 0);
         this.dead = false;
@@ -65,17 +64,15 @@ var Rocket = (function () {
         var self = this;
         
         if (this.exploding !== null) {
-            this.lastLocation.copy(this.contact);
+            this.path.start.copy(this.contact);
             this.velocity.scale(1.0 - EXPLOSION_AIR_RESISTANCE * elapsed);
             this.contact.addScaled(this.velocity, elapsed);
-            
-            this.path.start.copy(this.lastLocation);
             this.path.end.copy(this.contact);
             
-            if (this.path.length() > 0.5) { // No need to worry about low velocity explosions.
+            if (this.path.length() > 0.5) { // No need to worry about low velocity/stationary explosions.
                 this.path.extendBoth(5);
                 
-                environment.intersectPlatforms(this.path, function (platform, intersection) {
+                environment.closestPlatformIntersection(this.path, function (platform, intersection) {
                     self.velocity.set(0, 0);
                     self.contact.copy(intersection);
                 });
@@ -90,32 +87,25 @@ var Rocket = (function () {
             return true;
         }
         
-        this.lastLocation.copy(this.location);
+        this.path.start.copy(this.location);
         this.accelDirection.copy(this.velocity);
         this.accelDirection.normalize();
         this.velocity.addScaled(environment.gravity, elapsed);
         this.velocity.addScaled(this.accelDirection, this.acceleration * elapsed);
         this.location.addScaled(this.velocity, elapsed);
         this.acceleration *= elapsed * ROCKET_ACCEL_DECAY;
-        
-        this.path.start.copy(this.lastLocation);
         this.path.end.copy(this.location);
         this.path.extendAtEnd(ROCKET_LENGTH);
 
-        var collidePlatform = null,
-            closestCollisionSq = 0;
+        var collidePlatform = null;
         
-        environment.intersectPlatforms(this.path, function(platform, intersection) {
-            var contactDistance = LINEAR.pointDistanceSq(self.lastLocation, intersection);
-            if (collidePlatform === null || contactDistance < closestCollisionSq) {
-                collidePlatform = platform;
-                closestCollisionSq = contactDistance;
-            }
+        environment.closestPlatformIntersection(this.path, function(platform, intersection) {
+            collidePlatform = platform;
+            self.contact.copy(intersection);
         });
 
         if (collidePlatform !== null) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
-            collidePlatform.intersect(this.path, this.contact);
             this.velocity.set(0, 0);
             this.location.copy(this.contact);
         } else if (!buttonDown) {
