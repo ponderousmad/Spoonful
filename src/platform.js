@@ -77,6 +77,13 @@ var PLATFORMS = (function () {
         return this.segment.findIntersection(segment, contact);
     };
     
+    Platform.prototype.save = function() {
+        return {
+            start: this.start,
+            end: this.end
+        }
+    };
+    
     function intersectPlatforms(platforms, segment, onIntersect) {
         var intersection = new LINEAR.Vector(0, 0);
         for (var i = 0; i < platforms.length; ++i) {

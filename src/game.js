@@ -211,6 +211,20 @@
         return Math.max(0, this.teleportLeft / this.TELEPORT_TIME);
     };
     
+    environment.save = function () {
+        var platformData = [];
+        
+        for (var p = 0; p < this.platforms.length; ++p) {
+            platformData.push(this.platforms[p].save());
+        }
+        
+        return {
+            platforms: platformData,
+            portal: this.portal,
+            playerStart: this.player.location
+        }
+    }
+    
     function draw(context, width, height) {
         if (!loader.loaded) {
             return;
@@ -242,6 +256,11 @@
         lastTime = now;
     }
     
+    function saveLevel() {
+        var saveDiv = document.getElementById("save");
+        saveDiv.innerHTML = "<pre>" + JSON.stringify(environment.save(), null, 4) + "</pre>";
+    }
+    
     window.onload = function(e) {
         console.log("window.onload", e, Date.now());
         var canvas = document.getElementById("canvas"),
@@ -256,6 +275,7 @@
         
         window.setInterval(update, 16);
         
+        saveLevel();
         drawFrame();
     };
 }());
