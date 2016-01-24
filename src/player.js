@@ -158,16 +158,72 @@ var Player = (function () {
         this.path.start.copy(this.location);
         this.velocity.addScaled(this.acceleration, elapsed);
         this.location.addScaled(this.velocity, elapsed);
+        
+        var skipPlatform = null,
+            slid = false,
+            offEnd = false,
+            check = true;
+        
+        if (this.support !== null) {
+            var dot = this.support.segment.directedNormal().dot(this.velocity);
+            
+            if (dot < 0) { // Velocity into platform.
+                var offsetX = this.path.start.x - this.location.x;
+                if (offsetX == 0) {
+                    // No sliding velocity, we're done.
+                    this.location.y = this.path.start.y;
+                    this.velocity.set(0, 0);
+                } else {
+                    var closest = this.support.segment.closestPoint(this.location);
+                    if (closest.atEnd) {                   
+                        var direction = LINEAR.subVectors(closest.point, this.path.start);
+                        skipPlatform = true;
+                        if (direction.x != 0) {
+                            this.location.y = offsetX * (direction.y / direction.x);
+                            offEnd = true;
+                            slid = true;
+                        } else {
+                            this.falling = true;
+                            skipPlatform = this.support;
+                        }
+                    } else {
+                        this.location.copy(closest.point);
+                        slid = true;
+                        skipPlatform = this.support;
+                    }
+                }
+            } else {
+                skipPlatform = this.support;
+            }
+        }
+        
         this.path.end.copy(this.location);
         
-        environment.closestPlatformIntersection(this.path, function(platform, intersection) {
-            self.falling = false;
-            self.support = platform;
-            self.velocity.set(0, 0);
-            self.location.copy(intersection);
-        }, function(platform, intersection) {
-            return self.velocity.y >= 0 || platform != self.support; 
-        });
+        // if the velocity dot platform normal is pos/neg, project location onto platform, then
+        // intersect that path to check for horizontal intersections.
+        // Still need to deal with player width as well.
+
+        while (check && (slid || this.falling || this.support === null)) {
+            check = false;
+            environment.closestPlatformIntersection(this.path, function(platform, intersection) {
+                if (platform.run > 0) { // No support from vertical or inverted platforms.
+                    self.support = platform;
+                    self.falling = false;
+                    self.velocity.set(0, 0);
+                    self.location.copy(intersection);
+                } else {
+                    check = self.velocity.y != 0;
+                    self.location.x = intersection.x;
+                    self.path.end.x = self.location.x;
+                    skipPlatform = platform;
+                    if(slid && offEnd) {
+                        self.falling = true;
+                    }
+                }
+            }, function(platform, intersection) {
+                return platform != skipPlatform; 
+            });
+        }
         
         if (this.falling) {
             this.support = null;
