@@ -5,15 +5,15 @@ var Rocket = (function () {
         rocket = loader.load("rocket.png"),
         explosion = new Flipbook(loader, "explode", 8, 2),
         explodeSound = new SoundEffect("audio/explode.wav"),
-        ROCKET_LENGTH = 50,
+        ROCKET_LENGTH = 25,
         ROCKET_FLAME_OFFSET = 5,
         INITIAL_ROCKET_ACCELERATION = 0.02,
         ROCKET_ACCEL_DECAY = 0.025,
         EXPLOSION_TIME_PER_FRAME = 80,
         EXPLOSION_SIZE = 100,
-        EXPLOSION_STRENGTH = 500.0,
+        EXPLOSION_STRENGTH = 400.0,
         EXPLOSION_AIR_RESISTANCE = 0.015,
-        MAX_BLAST_FORCE = 0.04;
+        MAX_BLAST_FORCE = 0.03;
     
     loader.commit();
     

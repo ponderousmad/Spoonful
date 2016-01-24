@@ -16,7 +16,7 @@
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null,
         PORTAL_SPIN = Math.PI * 0.001,
-        PORTAL_SIZE = 150,
+        PORTAL_SIZE = 125,
         environment = {
             particles: [
                 new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1),
@@ -27,14 +27,15 @@
             ],
             platforms: [
                 new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
-                new PLATFORMS.Platform(new LINEAR.Vector(500, 300), new LINEAR.Vector(800, 300)),
-                new PLATFORMS.Platform(new LINEAR.Vector(750, 600), new LINEAR.Vector(750, 0)),
-                new PLATFORMS.Platform(new LINEAR.Vector(50, 0), new LINEAR.Vector(50, 600)),
-                new PLATFORMS.Platform(new LINEAR.Vector(800, 50), new LINEAR.Vector(0, 50))
+                new PLATFORMS.Platform(new LINEAR.Vector(500, 100), new LINEAR.Vector(800, 100)),
+                new PLATFORMS.Platform(new LINEAR.Vector(0, 300), new LINEAR.Vector(400, 300)),
+                new PLATFORMS.Platform(new LINEAR.Vector(750, 600), new LINEAR.Vector(750, -300)),
+                new PLATFORMS.Platform(new LINEAR.Vector(50, -300), new LINEAR.Vector(50, 600)),
+                new PLATFORMS.Platform(new LINEAR.Vector(800, -250), new LINEAR.Vector(0, -250))
             ],
             enemies: [
             ],
-            portal: new LINEAR.Vector(650, 200),
+            portal: new LINEAR.Vector(650, 30),
             portalAngle: 0,
             portalDraw: portalFrames.setupPlayback(80, true),
             gravity: new LINEAR.Vector(0, 0.0098),
