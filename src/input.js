@@ -58,7 +58,7 @@ var INPUT = (function (LINEAR) {
     };
     
     KeyboardState.prototype.postUpdate = function () {
-        this.lastPressed = {}
+        this.lastPressed = {};
         for (var p in this.pressed) {
             if (this.pressed.hasOwnProperty(p)) {
                 this.lastPressed[p] = this.pressed[p];
