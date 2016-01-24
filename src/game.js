@@ -258,14 +258,20 @@
     };
     
     environment.save = function () {
-        var platformData = [];
+        var platformData = [],
+            enemyData = [];
         
         for (var p = 0; p < this.platforms.length; ++p) {
             platformData.push(this.platforms[p].save());
         }
         
+        for (var e = 0; e < this.enemies.length; ++e) {
+            enemyData.push(this.enemies[e].save());
+        }
+        
         return {
             platforms: platformData,
+            enemies: enemyData,
             portal: this.portal,
             playerStart: this.player.location
         }
@@ -286,13 +292,25 @@
         request.onload = function () {
             console.log("Loading " + resource);
             var responseData = JSON.parse(request.response),
-                platformData = responseData["platforms"];
+                platformData = responseData["platforms"],
+                enemyData = responseData["enemies"];
+            enemyData = enemyData ? enemyData : [];
             
             self.platforms = [];
+            self.enemies = [];
             
             for (var p = 0; p < platformData.length; ++p) {
                 var platform = platformData[p];
                 self.platforms.push(new PLATFORMS.Platform(LINEAR.parseVector(platform.start), LINEAR.parseVector(platform.end)));
+            }
+            
+            for (var e = 0; e < enemyData.length; ++e) {
+                var enemy = enemyData[e],
+                    path = [];
+                for (var v = 0; v < enemy.path.length; ++v) {
+                    path.push(LINEAR.parseVector(enemy.path[v]));
+                }
+                self.enemies.push(new Enemy(enemy.type, path));
             }
             
             self.portal = LINEAR.parseVector(responseData["portal"]);
@@ -301,6 +319,8 @@
             self.levelDone = false;
             self.loading = false;
             self.fade = self.FADE_TIME;
+            
+            saveLevel();
         };
         request.send();
     };

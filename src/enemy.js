@@ -72,7 +72,7 @@ var Enemy = (function () {
     Enemy.prototype.save = function () {
         return {
             type: nameForType(this.type),
-            path: this.path()
+            path: this.path
         }
     };
     
