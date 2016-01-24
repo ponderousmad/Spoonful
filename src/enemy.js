@@ -91,7 +91,7 @@ var Enemy = (function () {
             attackPlayer = true;
             if (playerDistance < ATTACK_RANGE * ATTACK_RANGE) {
                 this.kill();
-                environment.player.kill();
+                environment.killPlayer();
             }
         } else {
             this.direction.copy(this.path[this.waypoint]);

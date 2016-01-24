@@ -7,7 +7,9 @@ var Player = (function () {
         rightLeg = loader.load("rightLeg.png"),
         arm = loader.load("arm.png"),
         gun = loader.load("gun.png"),
+        death = new Flipbook(loader, "explode", 8, 2),
         launchSound = new SoundEffect("audio/launch.wav"),
+        dieSound = new SoundEffect("audio/die.wav"),
         PLAYER_HEIGHT = 100,
         TORSO_SCALE = 0.67,
         LEG_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.42,
@@ -23,7 +25,9 @@ var Player = (function () {
         FLAIL_DAMPEN_FACTOR = 0.3,
         PLAYER_WIND_RESTANCE = 0.005,
         PLAYER_FRICTION = 0.015,
-        ROCKET_VELOCITY_SCALE = 0.01;
+        ROCKET_VELOCITY_SCALE = 0.01,
+        DEATH_FRAME_TIME = 80,
+        DEATH_SIZE = 100;
 
     loader.commit();
     
@@ -43,7 +47,7 @@ var Player = (function () {
         this.support = null;
         this.width = PLAYER_HEIGHT; // temporary value, need images to determine.
         
-        this.exploding = null;
+        this.dying = null;
         this.teleport = null;
         
         this.rockets = [];
@@ -105,9 +109,8 @@ var Player = (function () {
             return;
         }
         
-        if (this.exploding !== null) {
-            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
-            explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
+        if (this.dying !== null) {
+            explosion.draw(context, this.dying, this.centroid, DEATH_SIZE, DEATH_SIZE, true);
         } else {
             context.save();
             if (this.teleport != null) {
@@ -276,8 +279,8 @@ var Player = (function () {
     };
     
     Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
-        if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
-            this.exploding = null;
+        if (this.dying !== null && death.updatePlayback(elapsed, this.dying)) {
+            this.dying = null;
             return;
         }
         
@@ -301,7 +304,9 @@ var Player = (function () {
         }
     };
     
-    Player.prototype.kill = function (environment) {
+    Player.prototype.kill = function () {
+        dieSound.play();
+        this.dying = death.setupPlayback(DEATH_FRAME_TIME);
     };
     
     return Player;

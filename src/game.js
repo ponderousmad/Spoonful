@@ -17,7 +17,7 @@
         mouseState = null,
         MAX_LEVELS = 3,
         environment = {
-            level: 1,
+            level: 0,
             particles: [],
             platforms: [],
             enemies: [
@@ -325,18 +325,23 @@
         request.send();
     };
     
-    environment.loadNextLevel = function() {
+    environment.loadNextLevel = function () {
         this.level = Math.min(MAX_LEVELS, this.level + 1);
         var resource = baseURL + "levels/level" + (this.level > 10 ? "" : "0") + this.level + ".json";
         this.load(resource);
+    };
+    
+    environment.killPlayer = function () {
+        this.player.kill();
+        this.level -= 1;
+        this.levelDone = true;
+        this.fade = FADE_TIME;
     };
     
     function draw(context, width, height) {
         if (!loader.loaded) {
             return;
         }
-        
-        
         
         environment.draw(context, width, height);
 
