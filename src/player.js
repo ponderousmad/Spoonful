@@ -12,7 +12,7 @@ var Player = (function () {
         TORSO_SCALE = 0.67,
         LEG_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.43,
         ARM_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.52,
-        GUN_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.55,
+        GUN_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.555,
         ARM_OFFSET = PLAYER_HEIGHT * 0.19,
         LEG_OFFSET = 0.2,
         MAX_LEG_SWING = Math.PI * 0.05,
@@ -43,8 +43,26 @@ var Player = (function () {
         this.rockets = [];
     }
     
+    function drawImageTransformed(context, image, x, y, angle, xOffset, yOffset, width, height) {
+        context.save();
+        context.translate(x, y);
+        context.rotate(angle);
+        context.drawImage(image, xOffset, yOffset, width, height);
+        context.restore();
+    }
+    
     Player.prototype.draw = function (context) {
         if (!loader.loaded) {
+            return;
+        }
+        
+        for (var r = 0; r < this.rockets.length; ++r) {
+            this.rockets[r].draw(context);
+        }
+        
+        if (this.exploding !== null) {
+            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
+            explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
             return;
         }
         
@@ -61,41 +79,32 @@ var Player = (function () {
             gunHeight = gun.height * scaleFactor,
             gunPivotY = this.location.y - GUN_PIVOT_HEIGHT + DRAW_OFFSET,
             swing = Math.sin(this.swingDelta * SWING_RATE);
-            
-        context.save();
-        context.translate(this.location.x + legWidth * LEG_OFFSET, legPivotY);
-        context.rotate(MAX_LEG_SWING * swing);
-        context.drawImage(leftLeg, -legWidth * LEG_OFFSET, 0, legWidth, legHeight);
-        context.restore();
-
-        context.save();
-        context.translate(this.location.x - legWidth * LEG_OFFSET, legPivotY);
-        context.rotate(-MAX_LEG_SWING * swing);
-        context.drawImage(rightLeg, -legWidth * (1 - LEG_OFFSET), 0, legWidth, legHeight);
-        context.restore();
+        
+        drawImageTransformed(context, leftLeg,
+            this.location.x + legWidth * LEG_OFFSET, legPivotY,
+            MAX_LEG_SWING * swing,
+            -legWidth * LEG_OFFSET, 0, legWidth, legHeight
+        );
+        
+        drawImageTransformed(context, rightLeg,
+            this.location.x - legWidth * LEG_OFFSET, legPivotY,
+            -MAX_LEG_SWING * swing,
+            -legWidth * (1 - LEG_OFFSET), 0, legWidth, legHeight
+        );
 
         context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - PLAYER_HEIGHT + DRAW_OFFSET, torsoWidth, torsoHeight);
-                
-        context.save();
-        context.translate(this.location.x + ARM_OFFSET, armPivotY);
-        context.rotate(ARM_BASE_ANGLE - MAX_ARM_SWING * swing);
-        context.drawImage(arm, -armWidth * 0.5, -armWidth * 0.5, armWidth, armHeight);
-        context.restore();
-       
-        context.save();
-        context.translate(this.location.x, gunPivotY);
-        context.rotate(this.gunAngle);
-        context.drawImage(gun, -gunHeight * 0.5, -gunHeight * 0.5, gunWidth, gunHeight);
-        context.restore();
+
+        drawImageTransformed(context, arm,
+            this.location.x + ARM_OFFSET, armPivotY,
+            ARM_BASE_ANGLE - MAX_ARM_SWING * swing,
+            -armWidth * 0.5, -armWidth * 0.5, armWidth, armHeight
+        );
         
-        for (var r = 0; r < this.rockets.length; ++r) {
-            this.rockets[r].draw(context);
-        }
-        
-        if (this.exploding !== null) {
-            var explodeAt = LINEAR.addVectors(this.location, new LINEAR.Vector(0, -PLAYER_HEIGHT * 0.5));
-            explosion.draw(context, this.exploding, explodeAt, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
-        }
+        drawImageTransformed(context, gun,
+            this.location.x, gunPivotY,
+            this.gunAngle,
+            -gunHeight * 0.5, -gunHeight * 0.5, gunWidth, gunHeight
+        );
     };
     
     Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
