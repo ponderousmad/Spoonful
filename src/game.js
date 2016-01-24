@@ -336,6 +336,8 @@
             return;
         }
         
+        
+        
         environment.draw(context, width, height);
 
         if (drawTitle > 0) {
@@ -362,6 +364,22 @@
         lastTime = now;
     }
     
+    function safeWidth() {
+        var inner = window.innerWidth,
+            client = document.documentElement.clientWidth || inner,
+            body = document.getElementsByTagName('body')[0].clientWidth || inner;
+            
+        return Math.min(inner, client, body);
+    }
+    
+    function safeHeight() {
+        var inner = window.innerHeight,
+            client = document.documentElement.clientHeight || inner,
+            body = document.getElementsByTagName('body')[0].clientHeight || inner;
+            
+        return Math.min(inner, client, body) - 5;
+    }
+    
     window.onload = function(e) {
         console.log("window.onload", e, Date.now());
         var canvas = document.getElementById("canvas"),
@@ -374,6 +392,8 @@
         environment.loadNextLevel();
     
         function drawFrame() {
+            canvas.width  = safeWidth();
+            canvas.height = safeHeight();
             requestAnimationFrame(drawFrame);
             draw(context, canvas.width, canvas.height);
         }
