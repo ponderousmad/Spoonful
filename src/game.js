@@ -9,8 +9,6 @@
             loader.load("BackgroundStripe.png"),
             loader.load("BackgroundCubism.png")
         ],
-        platformImages = [
-        ],
         drawTitle = 2000,
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
@@ -32,7 +30,6 @@
             gravity: new LINEAR.Vector(0, 0.0098),
             player: new Player(new LINEAR.Vector(75, 550)),
         };
-        
     
     // One time initialization code
     (function() {
@@ -87,30 +84,44 @@
         context.drawImage(image, x + spareX, y + spareY);
     }
     
-    function draw(context, width, height) {
-        if (!loader.loaded) {
-            return;
-        }
-        
-        drawOffset.set(environment.player.centroid.x - width * 0.5, environment.player.centroid.y - height * 0.5);
+    environment.draw = function (context, width, height) {
+        drawOffset.set(this.player.centroid.x - width * 0.5, this.player.centroid.y - height * 0.5);
 
         context.save();
         context.translate(-drawOffset.x, -drawOffset.y);
         var tile = backgroundTiles[1];
         drawTiled(context, tile, drawOffset, width, height);
 
-        for (var p = 0; p < environment.particles.length; ++p) {
-            environment.particles[p].draw(context);
+        for (var p = 0; p < this.particles.length; ++p) {
+            this.particles[p].draw(context);
         }
         
         context.strokeStyle = "rgba(0,0,0,1)";
-        for (var f = 0; f < environment.platforms.length; ++f) {
-            environment.platforms[f].draw(context);
+        for (var f = 0; f < this.platforms.length; ++f) {
+            this.platforms[f].draw(context);
         }
         
-        environment.player.draw(context);
+        this.player.draw(context);
         context.restore();
+    };
+    
+    environment.update = function (elapsed) {
+        for (var p = 0; p < this.particles.length; ++p) {
+            this.particles[p].update(elapsed, this);
+        }
         
+        this.particles.sort(PARTICLES.Ordering);
+        
+        this.player.update(elapsed, this, keyboardState, mouseState, drawOffset);
+    };
+    
+    function draw(context, width, height) {
+        if (!loader.loaded) {
+            return;
+        }
+        
+        environment.draw(context, width, height);
+
         if (drawTitle > 0) {
             context.save();
             var FADE_TIME = 1000;
@@ -126,13 +137,7 @@
         var now = getTimestamp(),
             elapsed = Math.min(now - lastTime, 32);
         
-        for (var p = 0; p < environment.particles.length; ++p) {
-            environment.particles[p].update(elapsed, environment);
-        }
-        
-        environment.particles.sort(PARTICLES.Ordering);
-        
-        environment.player.update(elapsed, environment, keyboardState, mouseState, drawOffset);
+        environment.update(elapsed);
 
         keyboardState.postUpdate();
         mouseState.postUpdate();
