@@ -5,13 +5,24 @@ var PLATFORMS = (function () {
         images = [
             loader.load("girder.png")
         ],
-        TYPES = {
+        Types = {
             Girder: 0
         };
         
     loader.commit();
     
-    function Platform(start, end) {
+    function nameForType(type) {
+        for (var t in Types) {
+            if (Types.hasOwnProperty(t)) {
+                if (Types[t] === type) {
+                    return t;
+                }
+            }
+        }
+        return null;
+    }
+    
+    function Platform(start, end, type) {
         this.start = start.clone();
         this.end = end.clone();
         
@@ -20,7 +31,7 @@ var PLATFORMS = (function () {
         this.rise = end.y - start.y;
         this.run = end.x - start.x;
         
-        this.type = TYPES.Girder;
+        this.type = type ? Types[type] : Types.Girder;
     }
     
     Platform.prototype.draw = function (context) {
@@ -79,6 +90,7 @@ var PLATFORMS = (function () {
     
     Platform.prototype.save = function() {
         return {
+            type: nameForType(this.type),
             start: this.start,
             end: this.end
         }
@@ -96,6 +108,7 @@ var PLATFORMS = (function () {
     
     return {
         Platform: Platform,
+        Types: Types,
         intersect: intersectPlatforms
     };
 }());

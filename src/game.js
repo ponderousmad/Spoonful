@@ -1,4 +1,4 @@
-(function () {
+(function (baseURL) {
     "use strict";
     
     var loader = new ImageBatch("images/"),
@@ -36,6 +36,7 @@
             teleportLeft: 0,
             gravity: new LINEAR.Vector(0, 0.0098),
             player: new Player(new LINEAR.Vector(400, 550)),
+            loading: false
         };
     
     // One time initialization code
@@ -99,26 +100,31 @@
         var tile = backgroundTiles[2];
         drawTiled(context, tile, drawOffset, width, height);
         
-        context.save();
-        context.translate(this.portal.x, this.portal.y);
-        context.rotate(this.portalAngle);
-        portalFrames.draw(context, this.portalDraw, LINEAR.ZERO, this.PORTAL_SIZE, this.PORTAL_SIZE, true);
-        context.restore();
+        if (!this.loading) {
+            context.save();
+            context.translate(this.portal.x, this.portal.y);
+            context.rotate(this.portalAngle);
+            portalFrames.draw(context, this.portalDraw, LINEAR.ZERO, this.PORTAL_SIZE, this.PORTAL_SIZE, true);
+            context.restore();
 
-        for (var p = 0; p < this.particles.length; ++p) {
-            this.particles[p].draw(context);
+            for (var p = 0; p < this.particles.length; ++p) {
+                this.particles[p].draw(context);
+            }
+            
+            context.strokeStyle = "rgba(0,0,0,1)";
+            for (var f = 0; f < this.platforms.length; ++f) {
+                this.platforms[f].draw(context);
+            }
+            
+            this.player.draw(context);
         }
-        
-        context.strokeStyle = "rgba(0,0,0,1)";
-        for (var f = 0; f < this.platforms.length; ++f) {
-            this.platforms[f].draw(context);
-        }
-        
-        this.player.draw(context);
         context.restore();
     };
     
     environment.update = function (elapsed) {
+        if (this.loading) {
+            return;
+        }
         for (var p = 0; p < this.particles.length; ++p) {
             this.particles[p].update(elapsed, this);
         }
@@ -223,7 +229,40 @@
             portal: this.portal,
             playerStart: this.player.location
         }
+    };
+    
+    function saveLevel() {
+        var saveDiv = document.getElementById("save");
+        saveDiv.innerHTML = "<pre>" + JSON.stringify(environment.save(), null, 4) + "</pre>";
     }
+    
+    environment.load = function (resource) {
+        var self = this,
+            request = new XMLHttpRequest();
+            
+        this.loading = true;
+        request.open("GET", resource, true);
+        request.responseType = "text";
+        request.onload = function () {
+            console.log("Loading " + resource);
+            var responseData = JSON.parse(request.response),
+                platformData = responseData["platforms"];
+            
+            self.platforms = [];
+            
+            for (var p = 0; p < platformData.length; ++p) {
+                var platform = platformData[p];
+                self.platforms.push(new PLATFORMS.Platform(LINEAR.parseVector(platform.start), LINEAR.parseVector(platform.end)));
+            }
+            
+            self.portal = LINEAR.parseVector(responseData["portal"]);
+            self.player.reset(LINEAR.parseVector(responseData["playerStart"]));
+            
+            saveLevel();
+            self.loading = false;
+        };
+        request.send();
+    };
     
     function draw(context, width, height) {
         if (!loader.loaded) {
@@ -256,17 +295,14 @@
         lastTime = now;
     }
     
-    function saveLevel() {
-        var saveDiv = document.getElementById("save");
-        saveDiv.innerHTML = "<pre>" + JSON.stringify(environment.save(), null, 4) + "</pre>";
-    }
-    
     window.onload = function(e) {
         console.log("window.onload", e, Date.now());
         var canvas = document.getElementById("canvas"),
             context = canvas.getContext("2d");
             
         mouseState = new INPUT.MouseState(canvas);
+        
+        environment.load(baseURL + "levels/level01.json");
     
         function drawFrame() {
             requestAnimationFrame(drawFrame);
@@ -275,7 +311,6 @@
         
         window.setInterval(update, 16);
         
-        saveLevel();
         drawFrame();
     };
-}());
+}(rootURL));
