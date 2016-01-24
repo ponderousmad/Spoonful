@@ -127,7 +127,7 @@ var Player = (function () {
 
         if (collidePlatform !== null) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
-            collidePlatform.intersect(this.path, this.contact)
+            collidePlatform.intersect(this.path, this.contact);
             this.velocity.set(0, 0);
             this.location.copy(this.contact);
         } else if (!buttonDown) {
@@ -151,7 +151,7 @@ var Player = (function () {
         this.swingDelta = 0;
         this.gunAngle = 0;
         this.falling = false;
-        this.velocity = new LINEAR.Vector(0, 0)
+        this.velocity = new LINEAR.Vector(0, 0);
         this.acceleration = new LINEAR.Vector(0, 0);
         
         this.exploding = null;
@@ -234,7 +234,7 @@ var Player = (function () {
         }
         
         this.centroid.copy(this.location);
-        this.centroid.y -= PLAYER_HEIGHT * .5;
+        this.centroid.y -= PLAYER_HEIGHT * 0.5;
         this.acceleration.set(0, 0);
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
