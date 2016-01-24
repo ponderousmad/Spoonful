@@ -45,6 +45,10 @@ var PLATFORMS = (function () {
         return this.start.y + ((x - this.start.x) / this.run) * this.rise;
     };
     
+    Platform.prototype.xForY = function (y) {
+        return this.start.x + ((y - this.start.y) / this.rise) * this.run;
+    };
+    
     Platform.prototype.intersect = function (segment, contact) {
         return this.segment.findIntersection(segment, contact);
     };

@@ -23,12 +23,14 @@
             ],
             platforms: [
                 new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
-                new PLATFORMS.Platform(new LINEAR.Vector(750, 0), new LINEAR.Vector(750, 550))
+                new PLATFORMS.Platform(new LINEAR.Vector(750, 0), new LINEAR.Vector(750, 600)),
+                new PLATFORMS.Platform(new LINEAR.Vector(50, 600), new LINEAR.Vector(50, 0)),
+                new PLATFORMS.Platform(new LINEAR.Vector(800, 50), new LINEAR.Vector(0, 50))
             ],
             enemies: [
             ],
             gravity: new LINEAR.Vector(0, 0.0098),
-            player: new Player(new LINEAR.Vector(75, 550)),
+            player: new Player(new LINEAR.Vector(400, 550)),
         };
     
     // One time initialization code
@@ -138,6 +140,51 @@
         if (closestPlatform !== null) {
             onClosest(closestPlatform, closestIntersection, closestDistanceSq);
         }
+    };
+    
+    environment.wallCheck = function(location, radius, direction) {
+        var bound = null;
+        for (var p = 0; p < this.platforms.length; ++p) {
+            var platform = this.platforms[p];
+            if (platform.rise != 0) {
+                var closest = platform.segment.closestPoint(location),
+                    distanceSq = LINEAR.pointDistanceSq(closest.point, location);
+                if (distanceSq < radius * radius) {
+                    if (direction < 0) {
+                        if (closest.point.x < location.x) {
+                            var limit = closest.point.x + radius;
+                            if (bound == null || limit > bound) {
+                                bound = limit;
+                            }
+                        }
+                    } else {
+                        if (closest.point.x > location.x) {
+                            var limit = closest.point.x - radius;
+                            if (bound == null || limit < bound) {
+                                bound = limit;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return bound;
+    };
+    
+    environment.ceilingCheck = function(x, bottom, height) {
+        var bound = null;
+        for (var p = 0; p < this.platforms.length; ++p) {
+            var platform = this.platforms[p];
+            if (platform.run < 0) { // Only check inverted platforms.
+                var y = platform.yForX(x) + height;
+                if (y > bottom) {
+                    if (bound == null || y > bound) {
+                        bound = y;
+                    }
+                }
+            }
+        }
+        return bound;
     };
     
     function draw(context, width, height) {

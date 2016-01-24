@@ -33,10 +33,11 @@ var Player = (function () {
         this.path = new LINEAR.Segment(location.clone(), location.clone());
         this.swingDelta = 0;
         this.gunAngle = 0;
-        this.falling = false;
+        this.freefall = false;
         this.velocity = new LINEAR.Vector(0, 0);
         this.acceleration = new LINEAR.Vector(0, 0);
         this.support = null;
+        this.width = PLAYER_HEIGHT; // temporary value, need images to determine.
         
         this.exploding = null;
         
@@ -54,7 +55,6 @@ var Player = (function () {
     Player.prototype.drawBody = function (context) {
         var torsoHeight = PLAYER_HEIGHT * TORSO_SCALE,
             scaleFactor = torsoHeight / torso.height,
-            torsoWidth = torso.width * scaleFactor,
             legWidth = leftLeg.width * scaleFactor,
             legHeight = leftLeg.height * scaleFactor,
             legPivotY = this.location.y - LEG_PIVOT_HEIGHT + DRAW_OFFSET,
@@ -65,6 +65,8 @@ var Player = (function () {
             gunHeight = gun.height * scaleFactor,
             gunPivotY = this.location.y - GUN_PIVOT_HEIGHT + DRAW_OFFSET,
             swing = Math.sin(this.swingDelta * SWING_RATE);
+            
+        this.width = torso.width * scaleFactor,
         
         drawImageTransformed(context, leftLeg,
             this.location.x + legWidth * LEG_OFFSET, legPivotY,
@@ -78,7 +80,7 @@ var Player = (function () {
             -legWidth * (1 - LEG_OFFSET), 0, legWidth, legHeight
         );
 
-        context.drawImage(torso, this.location.x - torsoWidth * 0.5, this.location.y - PLAYER_HEIGHT + DRAW_OFFSET, torsoWidth, torsoHeight);
+        context.drawImage(torso, this.location.x - this.width * 0.5, this.location.y - PLAYER_HEIGHT + DRAW_OFFSET, this.width, torsoHeight);
 
         drawImageTransformed(context, arm,
             this.location.x + ARM_OFFSET, armPivotY,
@@ -111,6 +113,11 @@ var Player = (function () {
         }
     };
     
+    Player.prototype.updateCentroid = function () {
+        this.centroid.copy(this.location);
+        this.centroid.y -= PLAYER_HEIGHT * 0.5;
+    };
+    
     Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
         if (this.exploding !== null && explosion.updatePlayback(elapsed, this.exploding)) {
             this.exploding = null;
@@ -119,7 +126,7 @@ var Player = (function () {
         
         var self = this;
         
-        if (this.falling) {
+        if (this.freefall) {
             this.swingDelta += elapsed;
         } else {
             this.swingDelta *= FLAIL_DAMPEN_FACTOR;
@@ -137,8 +144,7 @@ var Player = (function () {
             launchSound.play();
         }
         
-        this.centroid.copy(this.location);
-        this.centroid.y -= PLAYER_HEIGHT * 0.5;
+        this.updateCentroid();
         this.acceleration.set(0, 0);
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
@@ -149,9 +155,9 @@ var Player = (function () {
         
         this.acceleration.add(environment.gravity);
         
-        if (!this.falling) {
+        if (!this.freefall) {
             if (this.acceleration.y < 0) {
-                this.falling = true;
+                this.freefall = true;
             }
         }
 
@@ -162,7 +168,7 @@ var Player = (function () {
         var skipPlatform = null,
             slid = false,
             offEnd = false,
-            check = true;
+            checkIntersections = true;
         
         if (this.support !== null) {
             var dot = this.support.segment.directedNormal().dot(this.velocity);
@@ -173,6 +179,7 @@ var Player = (function () {
                     // No sliding velocity, we're done.
                     this.location.y = this.path.start.y;
                     this.velocity.set(0, 0);
+                    checkIntersections = false;
                 } else {
                     var closest = this.support.segment.closestPoint(this.location);
                     if (closest.atEnd) {                   
@@ -183,7 +190,7 @@ var Player = (function () {
                             offEnd = true;
                             slid = true;
                         } else {
-                            this.falling = true;
+                            this.freefall = true;
                             skipPlatform = this.support;
                         }
                     } else {
@@ -203,21 +210,30 @@ var Player = (function () {
         // intersect that path to check for horizontal intersections.
         // Still need to deal with player width as well.
 
-        while (check && (slid || this.falling || this.support === null)) {
-            check = false;
+        while (checkIntersections && (slid || this.freefall || this.support === null)) {
+            this.updateCentroid();
+            var offset = this.path.end.x - this.path.start.x,
+                bound = environment.wallCheck(this.centroid, this.width * 0.5, offset);
+                
+            if (bound !== null) {
+                this.location.x = bound;
+                this.path.end.x = bound;
+            }               
+            
+            checkIntersections = false;
             environment.closestPlatformIntersection(this.path, function(platform, intersection) {
                 if (platform.run > 0) { // No support from vertical or inverted platforms.
                     self.support = platform;
-                    self.falling = false;
+                    self.freefall = false;
                     self.velocity.set(0, 0);
                     self.location.copy(intersection);
                 } else {
-                    check = self.velocity.y != 0;
+                    checkIntersections = self.velocity.y != 0;
                     self.location.x = intersection.x;
                     self.path.end.x = self.location.x;
                     skipPlatform = platform;
                     if(slid && offEnd) {
-                        self.falling = true;
+                        self.freefall = true;
                     }
                 }
             }, function(platform, intersection) {
@@ -225,7 +241,12 @@ var Player = (function () {
             });
         }
         
-        if (this.falling) {
+        if (this.freefall) {
+            var top = environment.ceilingCheck(this.location.x, this.location.y, PLAYER_HEIGHT)
+            if (top != null) {
+                this.location.y = top;
+                this.path.end.y = top;
+            }
             this.support = null;
         }
         
@@ -236,6 +257,7 @@ var Player = (function () {
             // Friction.
             this.velocity.x *= (1.0 - PLAYER_FRICTION * elapsed);
         }
+        this.updateCentroid();
     };
     
     return Player;
