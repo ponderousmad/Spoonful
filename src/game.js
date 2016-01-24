@@ -20,7 +20,16 @@
             level: 0,
             particles: [],
             platforms: [],
-            enemies: [],
+            enemies: [
+                new Enemy("Glider", [
+                    new LINEAR.Vector(200, 200),
+                    new LINEAR.Vector(650, 200),
+                    new LINEAR.Vector(700, 225),
+                    new LINEAR.Vector(650, 250),
+                    new LINEAR.Vector(200, 250),
+                    new LINEAR.Vector(150, 225)
+                ])
+            ],
             portal: new LINEAR.Vector(0, 0),
             portalAngle: 0,
             portalDraw: portalFrames.setupPlayback(80, true),
@@ -107,6 +116,10 @@
             for (var p = 0; p < this.particles.length; ++p) {
                 this.particles[p].draw(context);
             }
+
+            for (var e = 0; e < this.enemies.length; ++e) {
+                this.enemies[e].draw(context);
+            }
             
             context.strokeStyle = "rgba(0,0,0,1)";
             for (var f = 0; f < this.platforms.length; ++f) {
@@ -133,6 +146,10 @@
         }
         for (var p = 0; p < this.particles.length; ++p) {
             this.particles[p].update(elapsed, this);
+        }
+        
+        for (var e = 0; e < this.enemies.length; ++e) {
+            this.enemies[e].update(elapsed, this);
         }
         
         this.particles.sort(PARTICLES.Ordering);
