@@ -62,6 +62,8 @@ var Rocket = (function () {
     };
     
     Rocket.prototype.update = function (elapsed, buttonDown, environment) {
+        var self = this;
+        
         if (this.exploding !== null) {
             this.lastLocation.copy(this.contact);
             this.velocity.scale(1.0 - EXPLOSION_AIR_RESISTANCE * elapsed);
@@ -72,12 +74,11 @@ var Rocket = (function () {
             
             if (this.path.length() > 0.5) { // No need to worry about low velocity explosions.
                 this.path.extendBoth(5);
-                for (var i = 0; i < environment.platforms.length; ++i) {
-                    if (environment.platforms[i].intersect(this.path, this.location)) {
-                        this.velocity.set(0, 0);
-                        this.contact.copy(this.location);
-                    }
-                }
+                
+                environment.intersectPlatforms(this.path, function (platform, intersection) {
+                    self.velocity.set(0, 0);
+                    self.contact.copy(intersection);
+                });
             }
 
             if (explosion.updatePlayback(elapsed, this.exploding)) {
@@ -102,20 +103,15 @@ var Rocket = (function () {
         this.path.extendAtEnd(ROCKET_LENGTH);
 
         var collidePlatform = null,
-            collideEnemy = null,
             closestCollisionSq = 0;
         
-        for (var f = 0; f < environment.platforms.length; ++f) {
-            var platform = environment.platforms[f];
-            
-            if (platform.intersect(this.path, this.contact)) {
-                var contactDistance = LINEAR.pointDistanceSq(this.lastLocation, this.contact);
-                if (collidePlatform === null || contactDistance < closestCollisionSq) {
-                    collidePlatform = platform;
-                    closestCollisionSq = contactDistance;
-                }
+        environment.intersectPlatforms(this.path, function(platform, intersection) {
+            var contactDistance = LINEAR.pointDistanceSq(self.lastLocation, intersection);
+            if (collidePlatform === null || contactDistance < closestCollisionSq) {
+                collidePlatform = platform;
+                closestCollisionSq = contactDistance;
             }
-        }
+        });
 
         if (collidePlatform !== null) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);

@@ -115,6 +115,10 @@
         this.player.update(elapsed, this, keyboardState, mouseState, drawOffset);
     };
     
+    environment.intersectPlatforms = function(segment, onIntersect) {
+        PLATFORMS.intersect(this.platforms, segment, onIntersect)
+    };
+    
     function draw(context, width, height) {
         if (!loader.loaded) {
             return;

@@ -1,6 +1,12 @@
 var PLATFORMS = (function () {
     "use strict";
     
+    var loader = new ImageBatch("images/"),
+        images = [
+        ];
+        
+    loader.commit();
+    
     function Platform(start, end) {
         this.start = start.clone();
         this.end = end.clone();
@@ -43,7 +49,18 @@ var PLATFORMS = (function () {
         return this.segment.findIntersection(segment, contact);
     };
     
+    function intersectPlatforms(platforms, segment, onIntersect) {
+        var intersection = new LINEAR.Vector(0, 0);
+        for (var i = 0; i < platforms.length; ++i) {
+            var platform = platforms[i];
+            if (platform.intersect(segment, intersection)) {
+                onIntersect(platform, intersection);
+            }
+        }
+    }
+    
     return {
-        Platform: Platform
+        Platform: Platform,
+        intersect: intersectPlatforms
     };
 }());
