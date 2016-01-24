@@ -1,41 +1,19 @@
-var Player = (function () {
+var Rocket = (function () {
     "use strict";
     
     var loader = new ImageBatch("images/"),
-        torso = loader.load("torso.png"),
-        leftLeg = loader.load("leftLeg.png"),
-        rightLeg = loader.load("rightLeg.png"),
-        arm = loader.load("arm.png"),
-        gun = loader.load("gun.png"),
         rocket = loader.load("rocket.png"),
         explosion = new Flipbook(loader, "explode", 8, 2),
-        launchSound = new SoundEffect("audio/launch.wav"),
         explodeSound = new SoundEffect("audio/explode.wav"),
-        PLAYER_HEIGHT = 200,
-        TORSO_SCALE = 0.67,
-        LEG_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.43,
-        ARM_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.52,
-        GUN_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.55,
-        ARM_OFFSET = PLAYER_HEIGHT * 0.19,
-        LEG_OFFSET = 0.2,
-        MAX_LEG_SWING = Math.PI * 0.05,
-        MAX_ARM_SWING = Math.PI * 0.04,
-        ARM_BASE_ANGLE = Math.PI * 0.1,
-        DRAW_OFFSET = 0,
         ROCKET_LENGTH = 50,
         ROCKET_FLAME_OFFSET = 5,
         INITIAL_ROCKET_ACCELERATION = 0.02,
-        ROCKET_VELOCITY_SCALE = 0.01,
         ROCKET_ACCEL_DECAY = 0.025,
         EXPLOSION_TIME_PER_FRAME = 80,
         EXPLOSION_SIZE = 100,
         EXPLOSION_STRENGTH = 500.0,
         EXPLOSION_AIR_RESISTANCE = 0.015,
-        MAX_BLAST_FORCE = 0.04,
-        SWING_RATE = 0.005,
-        FLAIL_DAMPEN_FACTOR = 0.3,
-        PLAYER_WIND_RESTANCE = 0.005,
-        PLAYER_FRICTION = 0.015;
+        MAX_BLAST_FORCE = 0.04;
     
     loader.commit();
     
@@ -155,6 +133,38 @@ var Player = (function () {
         
         return true;
     };
+    
+    return Rocket;
+}());
+
+var Player = (function () {
+    "use strict";
+
+    var loader = new ImageBatch("images/"),
+        torso = loader.load("torso.png"),
+        leftLeg = loader.load("leftLeg.png"),
+        rightLeg = loader.load("rightLeg.png"),
+        arm = loader.load("arm.png"),
+        gun = loader.load("gun.png"),
+        launchSound = new SoundEffect("audio/launch.wav"),
+        PLAYER_HEIGHT = 200,
+        TORSO_SCALE = 0.67,
+        LEG_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.43,
+        ARM_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.52,
+        GUN_PIVOT_HEIGHT = PLAYER_HEIGHT * 0.55,
+        ARM_OFFSET = PLAYER_HEIGHT * 0.19,
+        LEG_OFFSET = 0.2,
+        MAX_LEG_SWING = Math.PI * 0.05,
+        MAX_ARM_SWING = Math.PI * 0.04,
+        ARM_BASE_ANGLE = Math.PI * 0.1,
+        DRAW_OFFSET = 0,
+        SWING_RATE = 0.005,
+        FLAIL_DAMPEN_FACTOR = 0.3,
+        PLAYER_WIND_RESTANCE = 0.005,
+        PLAYER_FRICTION = 0.015,
+        ROCKET_VELOCITY_SCALE = 0.01;
+
+    loader.commit();
     
     function Player(location) {
         this.location = location.clone();
