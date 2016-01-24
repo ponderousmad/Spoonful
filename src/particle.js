@@ -17,23 +17,23 @@ var PARTICLES = (function () {
         this.support = null;
     }
     
-    Particle.prototype.update = function (elapsed, platforms, particles, enemies, gravity) {
+    Particle.prototype.update = function (elapsed, environment) {
         if (this.support === null) {
-            this.velocity.addScaled(gravity, elapsed);
+            this.velocity.addScaled(environment.gravity, elapsed);
         }
         
-        for (var p = 0; p < particles.length; ++p) {
-            if (particles[p].isBelow(this.location)) {
-                var particle = particles[p];
+        for (var p = 0; p < environment.particles.length; ++p) {
+            if (environment.particles[p].isBelow(this.location)) {
+                var particle = environment.particles[p];
             }
         }
         
         var highestPlatform = null,
             highestPlatformHeight = 0;
         
-        for (var f = 0; f < platforms.length; ++f) {
-            if (platforms[f].isBelow(this.location)) {
-                var platform = platforms[f],
+        for (var f = 0; f < environment.platforms.length; ++f) {
+            if (environment.platforms[f].isBelow(this.location)) {
+                var platform = environment.platforms[f],
                     platformHeight = platform.yForX(this.location.x);
                 
                 if (highestPlatform === null || platformHeight < highestPlatformHeight) {

@@ -98,7 +98,7 @@ var Player = (function () {
         }
     };
     
-    Player.prototype.update = function (elapsed, platforms, particles, enemies, gravity, keyboard, mouse, drawOffset) {
+    Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
         if (this.falling) {
             this.swingDelta += elapsed;
         } else {
@@ -122,12 +122,12 @@ var Player = (function () {
         this.acceleration.set(0, 0);
         
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
-            if (!this.rockets[r].update(elapsed, mouse.left, this, platforms, particles, enemies, gravity)) {
+            if (!this.rockets[r].update(elapsed, mouse.left, this, environment)) {
                 this.rockets.splice(r, 1);
             }
         }
         
-        this.acceleration.add(gravity);
+        this.acceleration.add(environment.gravity);
         
         if (!this.falling) {
             if (this.acceleration.y < 0) {

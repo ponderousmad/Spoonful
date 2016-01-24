@@ -11,21 +11,23 @@
         ],
         platformImages = [
         ],
-        particles = [
-            new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1),
-            new PARTICLES.Particle(new LINEAR.Vector(23, 10), 5, 1),
-            new PARTICLES.Particle(new LINEAR.Vector(25, 0), 4, 1),
-            new PARTICLES.Particle(new LINEAR.Vector(30, 0), 3, 1),
-            new PARTICLES.Particle(new LINEAR.Vector(35, 0), 2, 1)
-        ],
-        platforms = [
-            new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
-            new PLATFORMS.Platform(new LINEAR.Vector(750, 0), new LINEAR.Vector(750, 550))
-        ],
-        enemies = [
-        ],
+        environment = {
+            particles: [
+                new PARTICLES.Particle(new LINEAR.Vector(20, 0), 5, 1),
+                new PARTICLES.Particle(new LINEAR.Vector(23, 10), 5, 1),
+                new PARTICLES.Particle(new LINEAR.Vector(25, 0), 4, 1),
+                new PARTICLES.Particle(new LINEAR.Vector(30, 0), 3, 1),
+                new PARTICLES.Particle(new LINEAR.Vector(35, 0), 2, 1)
+            ],
+            platforms: [
+                new PLATFORMS.Platform(new LINEAR.Vector(0, 550), new LINEAR.Vector(800, 550)),
+                new PLATFORMS.Platform(new LINEAR.Vector(750, 0), new LINEAR.Vector(750, 550))
+            ],
+            enemies: [
+            ],
+            gravity: new LINEAR.Vector(0, 0.0098)
+        },
         drawTitle = 2000,
-        gravity = new LINEAR.Vector(0, 0.0098),
         player = new Player(new LINEAR.Vector(75, 550)),
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
@@ -97,13 +99,13 @@
         var tile = backgroundTiles[1];
         drawTiled(context, tile, drawOffset, width, height);
 
-        for (var p = 0; p < particles.length; ++p) {
-            particles[p].draw(context);
+        for (var p = 0; p < environment.particles.length; ++p) {
+            environment.particles[p].draw(context);
         }
         
         context.strokeStyle = "rgba(0,0,0,1)";
-        for (var f = 0; f < platforms.length; ++f) {
-            platforms[f].draw(context);
+        for (var f = 0; f < environment.platforms.length; ++f) {
+            environment.platforms[f].draw(context);
         }
         
         player.draw(context);
@@ -124,13 +126,13 @@
         var now = getTimestamp(),
             elapsed = Math.min(now - lastTime, 32);
         
-        for (var p = 0; p < particles.length; ++p) {
-            particles[p].update(elapsed, platforms, particles, enemies, gravity);
+        for (var p = 0; p < environment.particles.length; ++p) {
+            environment.particles[p].update(elapsed, environment);
         }
         
-        particles.sort(PARTICLES.Ordering);
+        environment.particles.sort(PARTICLES.Ordering);
         
-        player.update(elapsed, platforms, particles, enemies, gravity, keyboardState, mouseState, drawOffset);
+        player.update(elapsed, environment, keyboardState, mouseState, drawOffset);
 
         keyboardState.postUpdate();
         mouseState.postUpdate();

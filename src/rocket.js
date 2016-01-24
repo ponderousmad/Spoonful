@@ -29,7 +29,7 @@ var Rocket = (function () {
         this.dead = false;
     }
     
-    Rocket.prototype.draw = function(context) {
+    Rocket.prototype.draw = function (context) {
         if (!loader.loaded) {
             return;
         }
@@ -61,7 +61,7 @@ var Rocket = (function () {
         return blastForce;
     };
     
-    Rocket.prototype.update = function (elapsed, buttonDown, player, platforms, particles, enemies, gravity) {
+    Rocket.prototype.update = function (elapsed, buttonDown, player, environment) {
         if (this.exploding !== null) {
             this.lastLocation.copy(this.contact);
             this.velocity.scale(1.0 - EXPLOSION_AIR_RESISTANCE * elapsed);
@@ -72,8 +72,8 @@ var Rocket = (function () {
             
             if (this.path.length() > 0.5) { // No need to worry about low velocity explosions.
                 this.path.extendBoth(5);
-                for (var i = 0; i < platforms.length; ++i) {
-                    if (platforms[i].intersect(this.path, this.location)) {
+                for (var i = 0; i < environment.platforms.length; ++i) {
+                    if (environment.platforms[i].intersect(this.path, this.location)) {
                         this.velocity.set(0, 0);
                         this.contact.copy(this.location);
                     }
@@ -92,7 +92,7 @@ var Rocket = (function () {
         this.lastLocation.copy(this.location);
         this.accelDirection.copy(this.velocity);
         this.accelDirection.normalize();
-        this.velocity.addScaled(gravity, elapsed);
+        this.velocity.addScaled(environment.gravity, elapsed);
         this.velocity.addScaled(this.accelDirection, this.acceleration * elapsed);
         this.location.addScaled(this.velocity, elapsed);
         this.acceleration *= elapsed * ROCKET_ACCEL_DECAY;
@@ -105,8 +105,8 @@ var Rocket = (function () {
             collideEnemy = null,
             closestCollisionSq = 0;
         
-        for (var f = 0; f < platforms.length; ++f) {
-            var platform = platforms[f];
+        for (var f = 0; f < environment.platforms.length; ++f) {
+            var platform = environment.platforms[f];
             
             if (platform.intersect(this.path, this.contact)) {
                 var contactDistance = LINEAR.pointDistanceSq(this.lastLocation, this.contact);
