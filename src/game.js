@@ -15,7 +15,7 @@
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null,
-        MAX_LEVELS = 2,
+        MAX_LEVELS = 3,
         environment = {
             level: 0,
             particles: [],

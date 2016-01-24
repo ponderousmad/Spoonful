@@ -1,0 +1,37 @@
+{
+    "platforms": [
+        {
+            "type": "Girder",
+            "start": {"x": 0,   "y": 550},
+            "end":   {"x": 800, "y": 550}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 0,   "y": -2000},
+            "end":   {"x": 800, "y": -2000}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 0,   "y": 300},
+            "end":   {"x": 400, "y": 300}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 50,  "y": 600},
+            "end":   {"x": 50,  "y": -2000}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 750, "y": -2000},
+            "end":   {"x": 750, "y": 600}
+        }
+    ],
+    "portal": {
+        "x": 150,
+        "y": 30
+    },
+    "playerStart": {
+        "x": 600,
+        "y": 550
+    }
+}
