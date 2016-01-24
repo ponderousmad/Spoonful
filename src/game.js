@@ -15,7 +15,9 @@
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null,
+        MAX_LEVELS = 2,
         environment = {
+            level: 0,
             particles: [],
             platforms: [],
             enemies: [],
@@ -25,9 +27,12 @@
             PORTAL_SPIN: Math.PI * 0.001,
             PORTAL_SIZE: 125,
             TELEPORT_TIME: 1000,
+            FADE_TIME: 1000,
             teleportLeft: 0,
             gravity: new LINEAR.Vector(0, 0.0098),
             player: new Player(new LINEAR.Vector(0, 0)),
+            fade: null,
+            levelDone: false,
             loading: false
         };
     
@@ -111,6 +116,15 @@
             this.player.draw(context);
         }
         context.restore();
+        
+        if (this.fade != null) {
+            var fade = this.fade / this.FADE_TIME;
+            if (this.levelDone) {
+                fade = 1.0 - fade;
+            }
+            context.fillStyle = "rgba(255,255,255," + fade + ")";
+            context.fillRect(0, 0, width, height);
+        }
     };
     
     environment.update = function (elapsed) {
@@ -127,6 +141,18 @@
         
         portalFrames.updatePlayback(elapsed, this.portalDraw);
         this.portalAngle += elapsed * this.PORTAL_SPIN;
+        
+        if (this.fade !== null) {
+            this.fade = Math.max(0, this.fade - elapsed);
+            
+            if(this.fade == 0) {
+                if (this.levelDone) {
+                    this.loadNextLevel();
+                } else {
+                    this.fade = null;
+                }
+            }
+        }
     };
     
     environment.intersectPlatforms = function(segment, onIntersect) {
@@ -200,13 +226,18 @@
     };
     
     environment.teleport = function() {
+        this.levelDone = true;
         this.teleportLeft = this.TELEPORT_TIME;
         return this.teleportLeft / this.TELEPORT_TIME;
     };
     
     environment.updateTeleport = function(elapsed) {
         this.teleportLeft -= elapsed;
-        return Math.max(0, this.teleportLeft / this.TELEPORT_TIME);
+        var teleport = Math.max(0, this.teleportLeft / this.TELEPORT_TIME);
+        if (this.fade === null && teleport < 0.5) {
+            this.fade = this.FADE_TIME;
+        }
+        return teleport;
     };
     
     environment.save = function () {
@@ -250,10 +281,17 @@
             self.portal = LINEAR.parseVector(responseData["portal"]);
             self.player.reset(LINEAR.parseVector(responseData["playerStart"]));
             
-            saveLevel();
+            self.levelDone = false;
             self.loading = false;
+            self.fade = self.FADE_TIME;
         };
         request.send();
+    };
+    
+    environment.loadNextLevel = function() {
+        this.level = Math.min(MAX_LEVELS, this.level + 1);
+        var resource = baseURL + "levels/level" + (this.level > 10 ? "" : "0") + this.level + ".json";
+        this.load(resource);
     };
     
     function draw(context, width, height) {
@@ -294,7 +332,9 @@
             
         mouseState = new INPUT.MouseState(canvas);
         
-        environment.load(baseURL + "levels/level01.json");
+        saveLevel();
+        
+        environment.loadNextLevel();
     
         function drawFrame() {
             requestAnimationFrame(drawFrame);
