@@ -277,7 +277,7 @@ var Player = (function () {
         
         if (this.teleport === null) {
             var portalDistance = LINEAR.pointDistance(this.centroid, environment.portal);
-            if (portalDistance < environment.PORTAL_SIZE) {
+            if (portalDistance < environment.PORTAL_SIZE * 0.5) {
                 this.teleport = environment.teleport();
             }
         } else {
