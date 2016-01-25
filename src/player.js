@@ -33,6 +33,8 @@ var Player = (function () {
     
     function Player(location) {
         this.reset(location);
+        
+        this.touchIDs = null;
     }
     
     Player.prototype.reset = function(location) {
@@ -141,16 +143,18 @@ var Player = (function () {
                 liveRocket = true;
             }
         }
-        
+
         // Filter out old touches.
         for (var t = 0; t < touchState.touches.length; ++t) {
             var touch = touchState.touches[t];
             touchIDs.push(touch.identifier);
             
-            for (var i = 0; i < this.touchIDs.length; ++i) {
-                if (this.touchIDs[i] === touch.identifier) {
-                    touch = null;
-                    break;
+            if (this.touchIDs !== null) {
+                for (var i = 0; i < this.touchIDs.length; ++i) {
+                    if (this.touchIDs[i] === touch.identifier) {
+                        touch = null;
+                        break;
+                    }
                 }
             }
             
@@ -161,7 +165,10 @@ var Player = (function () {
                 };
             }
         }
-        this.touchIDs = touchIDs;
+        
+        if (this.touchIDs !== null || touchIDs.length > 0) {
+            this.touchIDs = touchIDs;
+        }
         
         return liveRocket ? null : touched;
     };
@@ -172,10 +179,13 @@ var Player = (function () {
             direction = LINEAR.subVectors(LINEAR.addVectors(touch !== null ? touch.location : mouse.location, drawOffset), source);
         
         direction.scale(ROCKET_VELOCITY_SCALE);
-        this.gunAngle = Math.atan2(direction.y, direction.x);
+        if (this.touchIDs === null) {
+            this.gunAngle = Math.atan2(direction.y, direction.x);
+        }
 
         if (this.teleport === null && this.dying === null) {
             if (mouse.leftDown || touch !== null) {
+                this.gunAngle = Math.atan2(direction.y, direction.x);
                 this.rockets.push(new Rocket(source, direction, touch !== null ? touch.id : null));
                 launchSound.play();
             }
