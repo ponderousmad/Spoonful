@@ -76,11 +76,11 @@
         height += location.y - tileAlignedY;
         
         while (tileY < height) {
-            if (tileY + spanY > width) {
+            if (tileY + spanY > height) {
                 spanY = height - tileY;
             }
             while (tileX < width) {
-                if (tileX + spanY > width) {
+                if (tileX + spanX > width) {
                     spanX = width - tileX;
                 }
                 context.drawImage(tile, 0, 0, spanX, spanY, tileX + tileAlignedX, tileY + tileAlignedY, spanX, spanY);
