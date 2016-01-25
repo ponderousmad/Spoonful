@@ -333,10 +333,12 @@
     };
     
     environment.killPlayer = function () {
-        this.player.kill();
-        this.level -= 1;
-        this.levelDone = true;
-        this.fade = this.FADE_TIME;
+        if (this.fade === null) {
+            this.player.kill();
+            this.level -= 1;
+            this.levelDone = true;
+            this.fade = this.FADE_TIME;
+        }
     };
     
     function draw(context, width, height) {
