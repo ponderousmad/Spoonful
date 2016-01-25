@@ -131,23 +131,60 @@ var Player = (function () {
         this.centroid.y -= PLAYER_HEIGHT * 0.5;
     };
     
-    Player.prototype.updateRockets = function (elapsed, environment, mouse, drawOffset) {
-        var source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -GUN_PIVOT_HEIGHT)),
-            direction = LINEAR.subVectors(LINEAR.addVectors(mouse.location, drawOffset), source);
+    Player.prototype.checkForTouch = function (touchState) {      
+        var touched = null,
+            liveRocket = false,
+            touchIDs = [];
+            
+        for (var r = 0; r < this.rockets.length; ++r) {
+            if (this.rockets[r].isAlive()) {
+                liveRocket = true;
+            }
+        }
+        
+        // Filter out old touches.
+        for (var t = 0; t < touchState.touches.length; ++t) {
+            var touch = touchState.touches[t];
+            touchIDs.push(touch.identifier);
+            
+            for (var i = 0; i < this.touchIDs.length; ++i) {
+                if (this.touchIDs[i] === touch.identifier) {
+                    touch = null;
+                    break;
+                }
+            }
+            
+            if (touch !== null) {
+                touched = {
+                    location: new LINEAR.Vector(touch.clientX, touch.clientY),
+                    id: touch.identifier
+                };
+            }
+        }
+        this.touchIDs = touchIDs;
+        
+        return liveRocket ? null : touched;
+    };
+    
+    Player.prototype.updateRockets = function (elapsed, environment, mouse, touchState, drawOffset) {
+        var touch = this.checkForTouch(touchState),
+            source = LINEAR.addVectors(this.location, new LINEAR.Vector(5, -GUN_PIVOT_HEIGHT)),
+            direction = LINEAR.subVectors(LINEAR.addVectors(touch !== null ? touch.location : mouse.location, drawOffset), source);
         
         direction.scale(ROCKET_VELOCITY_SCALE);
-        
         this.gunAngle = Math.atan2(direction.y, direction.x);
-        
-        if (mouse.leftDown && this.teleport === null) {
-            this.rockets.push(new Rocket(source, direction));
-            launchSound.play();
+
+        if (this.teleport === null && this.dying === null) {
+            if (mouse.leftDown || touch !== null) {
+                this.rockets.push(new Rocket(source, direction, touch !== null ? touch.id : null));
+                launchSound.play();
+            }
         }
         
         this.updateCentroid();
         this.acceleration.set(0, 0);
         for (var r = this.rockets.length - 1; r >= 0 ; --r) {
-            if (!this.rockets[r].update(elapsed, mouse.left, environment)) {
+            if (!this.rockets[r].update(elapsed, mouse.left, touchState, environment)) {
                 this.rockets.splice(r, 1);
             }
         }
@@ -268,6 +305,8 @@ var Player = (function () {
             if (top !== null) {
                 this.location.y = top;
                 this.path.end.y = top;
+                this.velocity.y = 0;
+                this.acceleration.y = 0;
             }
             this.support = null;
         }
@@ -282,7 +321,7 @@ var Player = (function () {
         this.updateCentroid();
     };
     
-    Player.prototype.update = function (elapsed, environment, keyboard, mouse, drawOffset) {
+    Player.prototype.update = function (elapsed, environment, keyboard, mouse, touchState, drawOffset) {
         if (this.dying !== null && death.updatePlayback(elapsed, this.dying)) {
             this.dying = null;
             return;
@@ -294,7 +333,7 @@ var Player = (function () {
             this.swingDelta *= FLAIL_DAMPEN_FACTOR;
         }
         
-        this.updateRockets(elapsed, environment, mouse, drawOffset);
+        this.updateRockets(elapsed, environment, mouse, touchState, drawOffset);
         
         this.updatePhysics(elapsed, environment);
         

@@ -118,8 +118,33 @@ var INPUT = (function (LINEAR) {
         this.rightDown = false;
     };
     
+    function TouchState(element) {
+        this.touches = [];
+        
+        var self = this;
+        var handleTouch = function(e) {
+            self.touches = event.touches;
+            e.preventDefault();
+        };
+
+        element.addEventListener("touchstart", handleTouch);
+        element.addEventListener("touchend", handleTouch);
+        element.addEventListener("touchmove", handleTouch);
+        element.addEventListener("touchcancel", handleTouch);
+    }
+    
+    TouchState.prototype.getTouch = function (id) {
+        for (var t = 0; t < this.touches.length; ++t) {
+            if (this.touches[t].identifier == id) {
+                return this.touches[t];
+            }
+        }
+        return null;
+    };
+    
     return {
         KeyboardState: KeyboardState,
-        MouseState: MouseState
+        MouseState: MouseState,
+        TouchState: TouchState
     };
 }(LINEAR));

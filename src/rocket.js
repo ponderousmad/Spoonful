@@ -18,7 +18,7 @@ var Rocket = (function () {
     
     loader.commit();
     
-    function Rocket(location, velocity) {
+    function Rocket(location, velocity, touchID) {
         this.location = location.clone();
         this.velocity = velocity.clone();
         this.acceleration = INITIAL_ROCKET_ACCELERATION;
@@ -27,6 +27,7 @@ var Rocket = (function () {
         this.exploding = null;
         this.contact = new LINEAR.Vector(0, 0);
         this.dead = false;
+        this.touchID = touchID;
     }
     
     Rocket.prototype.draw = function (context) {
@@ -73,9 +74,9 @@ var Rocket = (function () {
                 }
             }
         }
-    }
+    };
     
-    Rocket.prototype.update = function (elapsed, buttonDown, environment) {
+    Rocket.prototype.update = function (elapsed, buttonDown, touchState, environment) {
         var self = this;
         
         if (this.exploding !== null) {
@@ -126,7 +127,7 @@ var Rocket = (function () {
             collide = true;
             this.velocity.set(0, 0);
             this.location.copy(this.contact);
-        } else if (!buttonDown) {
+        } else if ((this.touchID === null && !buttonDown) || (this.touchID !== null && touchState.getTouch(this.touchID) === null)) {
             collide = true;
             this.contact.copy(this.location);
         } else {
@@ -149,6 +150,10 @@ var Rocket = (function () {
         }
         
         return true;
+    };
+    
+    Rocket.prototype.isAlive = function() {
+        return this.exploding === null;
     };
     
     return Rocket;

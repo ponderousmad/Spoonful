@@ -15,6 +15,7 @@
         drawOffset = new LINEAR.Vector(0, 0),
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null,
+        touchState = null,
         MAX_LEVELS = 3,
         environment = {
             level: 0,
@@ -154,7 +155,7 @@
         
         this.particles.sort(PARTICLES.Ordering);
         
-        this.player.update(elapsed, this, keyboardState, mouseState, drawOffset);
+        this.player.update(elapsed, this, keyboardState, mouseState, touchState, drawOffset);
         
         portalFrames.updatePlayback(elapsed, this.portalDraw);
         this.portalAngle += elapsed * this.PORTAL_SPIN;
@@ -391,6 +392,7 @@
             context = canvas.getContext("2d");
             
         mouseState = new INPUT.MouseState(canvas);
+        touchState = new INPUT.TouchState(canvas);
         
         saveLevel();
         
