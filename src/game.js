@@ -130,8 +130,8 @@
         }
         context.restore();
         
-        if (this.fade != null) {
-            var fade = this.fade / this.FADE_TIME;
+        if (this.fade !== null || this.loading) {
+            var fade = this.fade === null ? 1.0 : this.fade / this.FADE_TIME;
             if (this.levelDone) {
                 fade = 1.0 - fade;
             }
