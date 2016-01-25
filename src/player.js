@@ -7,7 +7,7 @@ var Player = (function () {
         rightLeg = loader.load("rightLeg.png"),
         arm = loader.load("arm.png"),
         gun = loader.load("gun.png"),
-        death = new Flipbook(loader, "explode", 8, 2),
+        death = new Flipbook(loader, "portal", 16, 2),
         launchSound = new SoundEffect("audio/launch.wav"),
         dieSound = new SoundEffect("audio/die.wav"),
         PLAYER_HEIGHT = 100,
@@ -26,7 +26,7 @@ var Player = (function () {
         PLAYER_WIND_RESTANCE = 0.005,
         PLAYER_FRICTION = 0.015,
         ROCKET_VELOCITY_SCALE = 0.01,
-        DEATH_FRAME_TIME = 80,
+        DEATH_FRAME_TIME = 100,
         DEATH_SIZE = 100;
 
     loader.commit();
@@ -110,7 +110,7 @@ var Player = (function () {
         }
         
         if (this.dying !== null) {
-            explosion.draw(context, this.dying, this.centroid, DEATH_SIZE, DEATH_SIZE, true);
+            death.draw(context, this.dying, this.centroid, DEATH_SIZE, DEATH_SIZE, true);
         } else {
             context.save();
             if (this.teleport != null) {
