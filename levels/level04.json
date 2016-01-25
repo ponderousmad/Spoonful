@@ -99,6 +99,26 @@
             "type": "Girder",
             "start": {"x": 540, "y": 205},
             "end":   {"x": 600, "y": 290}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 625, "y": 300},
+            "end":   {"x": 625, "y": 200}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 700, "y": 220},
+            "end":   {"x": 700, "y": 280}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 640, "y": 200},
+            "end":   {"x": 700, "y": 220}
+        },
+        {
+            "type": "Girder",
+            "start": {"x": 630, "y": 285},
+            "end":   {"x": 690, "y": 265}
         }
     ],
     "enemies": [

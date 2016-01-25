@@ -16,7 +16,7 @@
         keyboardState = new INPUT.KeyboardState(window),
         mouseState = null,
         touchState = null,
-        MAX_LEVELS = 3,
+        MAX_LEVELS = 4,
         environment = {
             level: 0,
             particles: [],
