@@ -49,7 +49,7 @@ var Enemy = (function () {
         context.save();
         context.translate(this.location.x, this.location.y);
         context.rotate(this.angle);
-        if (this.exploding != null) {
+        if (this.exploding !== null) {
             explosion.draw(context, this.exploding, LINEAR.ZERO, EXPLOSION_SIZE, EXPLOSION_SIZE, true);
         } else {
             this.radius = image.width * 0.5;
@@ -115,21 +115,21 @@ var Enemy = (function () {
     };
     
     Enemy.prototype.kill = function () {
-        if (this.exploding == null ) {
+        if (this.exploding === null ) {
             this.exploding = explosion.setupPlayback(EXPLOSION_TIME_PER_FRAME);
             boomSound.play();
         }
-    }
+    };
     
     Enemy.prototype.isAlive = function() {
-        return !this.dead && this.exploding == null;
-    }
+        return !this.dead && this.exploding === null;
+    };
     
     Enemy.prototype.save = function () {
         return {
             type: nameForType(this.type),
             path: this.path
-        }
+        };
     };
     
     return Enemy;

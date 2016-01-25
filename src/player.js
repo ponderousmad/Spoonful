@@ -75,7 +75,7 @@ var Player = (function () {
             gunPivotY = this.location.y - GUN_PIVOT_HEIGHT + DRAW_OFFSET,
             swing = Math.sin(this.swingDelta * SWING_RATE);
             
-        this.width = torso.width * scaleFactor,
+        this.width = torso.width * scaleFactor;
         
         drawImageTransformed(context, leftLeg,
             this.location.x + legWidth * LEG_OFFSET, legPivotY,
@@ -113,7 +113,7 @@ var Player = (function () {
             death.draw(context, this.dying, this.centroid, DEATH_SIZE, DEATH_SIZE, true);
         } else {
             context.save();
-            if (this.teleport != null) {
+            if (this.teleport !== null) {
                 context.globalAlpha = this.teleport;
             }
             this.drawBody(context);
@@ -163,7 +163,7 @@ var Player = (function () {
             this.velocity.x = 0;
             this.acceleration.x = 0;
         }
-    }
+    };
     
     Player.prototype.updatePhysics = function (elapsed, environment) {
         var self = this;
@@ -183,7 +183,7 @@ var Player = (function () {
         }
         this.location.addScaled(this.velocity, elapsed);
         
-        if (this.teleport != null) {
+        if (this.teleport !== null) {
             var teleportFeet = environment.portal.clone();
             teleportFeet.y -= PLAYER_HEIGHT * 0.5;
             this.location.scale(this.teleport);
@@ -200,7 +200,7 @@ var Player = (function () {
             
             if (dot < 0) { // Velocity into platform.
                 var offsetX = this.path.start.x - this.location.x;
-                if (offsetX == 0) {
+                if (offsetX === 0) {
                     // No sliding velocity, we're done.
                     this.location.y = this.path.start.y;
                     this.velocity.set(0, 0);
@@ -210,7 +210,7 @@ var Player = (function () {
                     if (closest.atEnd) {                   
                         var direction = LINEAR.subVectors(closest.point, this.path.start);
                         skipPlatform = true;
-                        if (direction.x != 0) {
+                        if (direction.x !== 0) {
                             this.location.y = offsetX * (direction.y / direction.x);
                             offEnd = true;
                             slid = true;
@@ -231,37 +231,41 @@ var Player = (function () {
         
         this.path.end.copy(this.location);
         
+        var onClosest = function(platform, intersection) {
+            if (platform.run > 0) { // No support from vertical or inverted platforms.
+                self.support = platform;
+                self.freefall = false;
+                self.velocity.set(0, 0);
+                self.location.copy(intersection);
+            } else {
+                checkIntersections = self.velocity.y !== 0;
+                if(!checkIntersections) {
+                    self.wallBound(elapsed, environment);
+                }
+                self.location.x = intersection.x;
+                self.path.end.x = self.location.x;
+                skipPlatform = platform;
+                if(slid && offEnd) {
+                    self.freefall = true;
+                }
+            }
+        };
+        
+        var filterPlatforms = function(platform, intersection) {
+            return platform != skipPlatform; 
+        };
+        
         while (checkIntersections && (slid || this.freefall || this.support === null)) {
             this.updateCentroid();
             this.wallBound(elapsed, environment);
             
             checkIntersections = false;
-            environment.closestPlatformIntersection(this.path, function(platform, intersection) {
-                if (platform.run > 0) { // No support from vertical or inverted platforms.
-                    self.support = platform;
-                    self.freefall = false;
-                    self.velocity.set(0, 0);
-                    self.location.copy(intersection);
-                } else {
-                    checkIntersections = self.velocity.y != 0;
-                    if(!checkIntersections) {
-                        self.wallBound(elapsed, environment);
-                    }
-                    self.location.x = intersection.x;
-                    self.path.end.x = self.location.x;
-                    skipPlatform = platform;
-                    if(slid && offEnd) {
-                        self.freefall = true;
-                    }
-                }
-            }, function(platform, intersection) {
-                return platform != skipPlatform; 
-            });            
+            environment.closestPlatformIntersection(this.path, onClosest, filterPlatforms);            
         }
         
         if (this.freefall) {
-            var top = environment.ceilingCheck(this.location.x, this.location.y, PLAYER_HEIGHT)
-            if (top != null) {
+            var top = environment.ceilingCheck(this.location.x, this.location.y, PLAYER_HEIGHT);
+            if (top !== null) {
                 this.location.y = top;
                 this.path.end.y = top;
             }

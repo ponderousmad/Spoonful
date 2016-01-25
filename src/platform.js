@@ -93,7 +93,7 @@ var PLATFORMS = (function () {
             type: nameForType(this.type),
             start: this.start,
             end: this.end
-        }
+        };
     };
     
     function intersectPlatforms(platforms, segment, onIntersect) {

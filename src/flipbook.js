@@ -15,7 +15,7 @@
             elapsed: 0,
             timePerFrame: frameTime,
             fractionComplete: 0,
-            loop: loop == true
+            loop: loop === true
         };
     };
     

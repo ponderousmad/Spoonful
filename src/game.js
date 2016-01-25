@@ -162,7 +162,7 @@
         if (this.fade !== null) {
             this.fade = Math.max(0, this.fade - elapsed);
             
-            if(this.fade == 0) {
+            if (this.fade === 0) {
                 if (this.levelDone) {
                     this.loadNextLevel();
                 } else {
@@ -173,7 +173,7 @@
     };
     
     environment.intersectPlatforms = function(segment, onIntersect) {
-        PLATFORMS.intersect(this.platforms, segment, onIntersect)
+        PLATFORMS.intersect(this.platforms, segment, onIntersect);
     };
     
     environment.closestPlatformIntersection = function(segment, onClosest, filter) {
@@ -201,22 +201,22 @@
         var bound = null;
         for (var p = 0; p < this.platforms.length; ++p) {
             var platform = this.platforms[p];
-            if (platform.rise != 0) {
+            if (platform.rise !== 0) {
                 var closest = platform.segment.closestPoint(location),
                     distanceSq = LINEAR.pointDistanceSq(closest.point, location);
                 if (distanceSq < radius * radius) {
                     if (direction < 0) {
                         if (closest.point.x < location.x) {
-                            var limit = closest.point.x + radius;
-                            if (bound == null || limit > bound) {
-                                bound = limit;
+                            var rightLimit = closest.point.x + radius;
+                            if (bound === null || rightLimit > bound) {
+                                bound = rightLimit;
                             }
                         }
                     } else {
                         if (closest.point.x > location.x) {
-                            var limit = closest.point.x - radius;
-                            if (bound == null || limit < bound) {
-                                bound = limit;
+                            var leftLimit = closest.point.x - radius;
+                            if (bound === null || leftLimit < bound) {
+                                bound = leftLimit;
                             }
                         }
                     }
@@ -233,7 +233,7 @@
             if (platform.run < 0) { // Only check inverted platforms.
                 var y = platform.yForX(x) + height;
                 if (y > bottom) {
-                    if (bound == null || y > bound) {
+                    if (bound === null || y > bound) {
                         bound = y;
                     }
                 }
@@ -274,7 +274,7 @@
             enemies: enemyData,
             portal: this.portal,
             playerStart: this.player.location
-        }
+        };
     };
     
     function saveLevel() {
@@ -292,8 +292,8 @@
         request.onload = function () {
             console.log("Loading " + resource);
             var responseData = JSON.parse(request.response),
-                platformData = responseData["platforms"],
-                enemyData = responseData["enemies"];
+                platformData = responseData.platforms,
+                enemyData = responseData.enemies;
             enemyData = enemyData ? enemyData : [];
             
             self.platforms = [];
@@ -313,8 +313,8 @@
                 self.enemies.push(new Enemy(enemy.type, path));
             }
             
-            self.portal = LINEAR.parseVector(responseData["portal"]);
-            self.player.reset(LINEAR.parseVector(responseData["playerStart"]));
+            self.portal = LINEAR.parseVector(responseData.portal);
+            self.player.reset(LINEAR.parseVector(responseData.playerStart));
             
             self.levelDone = false;
             self.loading = false;
