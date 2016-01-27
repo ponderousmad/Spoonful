@@ -10,7 +10,7 @@ var Enemy = (function () {
         EXPLOSION_TIME_PER_FRAME = 80,
         FOLLOW_DISTANCE = 250,
         ATTACK_RANGE = 50,
-        boomSound = new SoundEffect("audio/boom.wav"),
+        boomSound = new AUDIO.SoundEffect("audio/boom.wav"),
         Types = {
             Glider: 0
         };
